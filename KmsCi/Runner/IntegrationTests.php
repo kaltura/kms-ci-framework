@@ -13,12 +13,14 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
         $this->_isRemote = $val;
     }
 
-    public function run()
+    public function run($isSetupIntegration = false)
     {
         $testsPath = $this->_runner->getConfig('integrationTestsPath', '');
         if (empty($testsPath)) {
             $this->_runner->log('WARNING: no integrationTestsPath');
             return true;
+        } elseif ($isSetupIntegration) {
+            return $this->setupIntegration($this->_runner->getArg('setup-integration'));
         } else {
             $ret = true;
             foreach (glob($this->_runner->getConfig('integrationTestsPath').'/*') as $fn) {
@@ -55,7 +57,7 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
     public function setupIntegration($integId)
     {
         $clsname = 'IntegrationTests_'.$integId;
-        $mainfn = $this->_runner->getConfig('integrationTestsPath').'/tests/ci/integrations/'.$integId.'/main.php';
+        $mainfn = $this->_runner->getConfig('integrationTestsPath').'/'.$integId.'/main.php';
         if (!file_exists($mainfn)) {
             echo "file not found: {$mainfn}\n";
             return false;

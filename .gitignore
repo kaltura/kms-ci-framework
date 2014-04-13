@@ -3,4 +3,5 @@ LICENSE.txt
 README.txt
 demos/
 extras/documentation
-kmsci.conf.local.php
+/kmsci.conf.local.php
+/.build

@@ -24,4 +24,9 @@ class KmsCi_Environment_BaseHelper {
         return $this->_runner->error($msg);
     }
 
+    public function invoke($evtName, $evtParams)
+    {
+        return true;
+    }
+
 }

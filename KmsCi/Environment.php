@@ -31,6 +31,17 @@ class KmsCi_Environment {
         }
     }
 
+    /**
+     * This method allows extending classes to modify the order of helper invocations for a specific event
+     * @param $evtName
+     * @param $evtParams
+     * @return array of helper names
+     */
+    protected function _getHelperNames($evtName, $evtParams)
+    {
+        return array('code', 'config', 'logs', 'cache');
+    }
+
     public function getHelper($name)
     {
         if (!isset($this->_helpers[$name])) {
@@ -49,6 +60,22 @@ class KmsCi_Environment {
     {
         echo $str."\n";
         return true;
+    }
+
+    public function invoke($evtName, $evtParams = array(), $breakOnError = true)
+    {
+        $ret = true;
+        foreach ($this->_getHelperNames($evtName, $evtParams) as $helperName) {
+            $helper = $this->getHelper($helperName);
+            if (!is_null($helper)) {
+                if (!$helper->invoke($evtName, $evtParams)) {
+                    $this->error('failed invoke of "'.$evtName.'", with params: '.print_r($evtParams, true));
+                    $ret = false;
+                    if ($breakOnError) break;
+                }
+            }
+        }
+        return $ret;
     }
 
 }

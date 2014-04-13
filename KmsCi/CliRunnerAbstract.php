@@ -190,13 +190,21 @@ abstract class KmsCi_CliRunnerAbstract {
         );
     }
 
-    abstract protected function _getNewEnvironment();
+    protected function _getNewEnvironment()
+    {
+        return new KmsCi_Environment($this);
+    }
 
-    protected function _runRunner($runnerId, $title, $runnerClassName)
+    protected function _runRunner($runnerId, $title, $runnerClassName, $params = null)
     {
         echo "\n{$title}\n\n";
+        /** @var KmsCi_Runner_Base $runner */
         $runner = new $runnerClassName($this);
-        $tmp = $runner->run();
+        if (is_null($params)) {
+            $tmp = $runner->run();
+        } else {
+            $tmp = $runner->run($params);
+        }
         echo "\n";
         return $tmp;
     }
@@ -228,19 +236,12 @@ abstract class KmsCi_CliRunnerAbstract {
 
     protected function _setupIntegration()
     {
-
+        return $this->_runRunner('setup-integration', 'Setting up integration '.$this->getArg('setup-integration'), 'KmsCi_Runner_IntegrationTests', true);
     }
 
     protected function _runRestore()
     {
-        $ret = true;
-        $ret = is_null($this->_environment->getHelper('code'))
-            || $this->_environment->getHelper('code')->restore() ? $ret : $this->error('Failed to restore code');
-        $ret = is_null($this->_environment->getHelper('config'))
-            || $this->_environment->getHelper('config')->restore() ? $ret : $this->error('Failed to restore config');
-        $ret = is_null($this->_environment->getHelper('cache'))
-            || $this->_environment->getHelper('cache')->clear() ? $ret : $this->error('Failed to clear the cache');
-        return $ret;
+        return $this->_environment->invoke('CliRunner::_runRestore', array(), false);
     }
 
     protected function _runBuild()

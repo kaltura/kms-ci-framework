@@ -24,10 +24,12 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
 
     protected function _copyLogs()
     {
-        if (!is_null($this->_runner->getEnvironment()->getHelper('logs'))) {
+        /** @var KmsCi_Environment_LogsHelper $logsHelper */
+        $logsHelper = $this->_runner->getEnvironment()->getHelper('logs');
+        if (!is_null($logsHelper)) {
             $destPath = $this->_getOutputPath().'/logs';
             echo "Copying logs to {$destPath}\n";
-            return $this->_runner->getEnvironment()->getHelper('logs')->copyTo($destPath);
+            return $logsHelper->copyTo($destPath);
         } else {
             return true;
         }
@@ -70,10 +72,8 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
 
     protected function _postRun() {
         return (
-            (
-                is_null($this->_runner->getEnvironment()->getHelper('config'))
-                || $this->_runner->getEnvironment()->getHelper('config')->remove(true)
-            ) && $this->_copyLogs()
+            $this->_runner->getEnvironment()->invoke('IntegrationTest::_postRun', array($this->_integid))
+            && $this->_copyLogs()
         );
     }
 
@@ -114,15 +114,7 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
 
     public function setup()
     {
-        $ret = true;
-        $ret = is_null($this->_runner->getEnvironment()->getHelper('code'))
-            || $this->_runner->getEnvironment()->getHelper('code')->setup() ? $ret : false;
-        $ret = is_null($this->_runner->getEnvironment()->getHelper('config'))
-            || $this->_runner->getEnvironment()->getHelper('config')->remove() ? $ret : false;
-        $ret = is_null($this->_runner->getEnvironment()->getHelper('logs'))
-            || $this->_runner->getEnvironment()->getHelper('logs')->clear() ? $ret : false;
-        $ret = is_null($this->_runner->getEnvironment()->getHelper('cache'))
-            || $this->_runner->getEnvironment()->getHelper('cache')->clear() ? $ret : false;
+        $ret = $this->_runner->getEnvironment()->invoke('IntegrationTest::setup', array($this->_integid));
         if (!$ret) {
             return $this->_runner->error('failed to do initial setting up of environment for integration');
         } elseif (!$this->_initDirectories()) {

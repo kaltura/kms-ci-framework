@@ -6,9 +6,15 @@
 
 class IntegrationTests_main extends KmsCi_Runner_IntegrationTest_Base {
 
-    public function test()
+    public function testDummy()
     {
-        echo 'OK';
+        echo "OK\n";
+        return true;
+    }
+
+    public function testUnitTestsBootstrap()
+    {
+        echo "OK\n";
         return true;
     }
 
