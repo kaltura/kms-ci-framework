@@ -14,8 +14,13 @@ class IntegrationTests_main extends KmsCi_Runner_IntegrationTest_Base {
 
     public function testUnitTestsBootstrap()
     {
-        echo "OK\n";
-        return true;
+        if ($GLOBALS['SET_FROM_BOOTSTRAP'] == 'YES!') {
+            echo "OK\n";
+            return true;
+        } else {
+            echo "FAILED\n";
+            return false;
+        }
     }
 
 }

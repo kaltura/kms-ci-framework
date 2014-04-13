@@ -23,7 +23,7 @@ class KmsCiFramework_CliRunner extends KmsCi_CliRunnerAbstract {
                 $ret = $this->error('did not find '.$logfile);
             } else {
                 $tmp = explode("\n", file_get_contents($logfile));
-                $ret = ($tmp[count($tmp)-2] == 'OK');
+                $ret = ($tmp[count($tmp)-2] == 'OK') ? $ret : false;
             }
         }
         return $ret;
