@@ -69,7 +69,12 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
                 echo "Failed to setup integration\n";
                 return false;
             } else {
-                return true;
+                $filterTests = $this->_runner->getArg('filter-tests', '');
+                if (empty($filterTests)) {
+                    return true;
+                } else {
+                    return $tests->runSetupTests($filterTests);
+                }
             }
         }
     }

@@ -30,7 +30,7 @@ class KmsCi_Environment_UtilHelper extends KmsCi_Environment_BaseHelper {
     // recursively remove a directory
     public function rrmdir($dir) {
         foreach(glob($dir . '/*') as $file) {
-            if(is_dir($file)) {
+            if (is_dir($file)) {
                 if (!$this->rrmdir($file)) {
                     return $this->error('failed to recursively remove directory '.$file);
                 }

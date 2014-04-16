@@ -11,6 +11,8 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
 
     protected $_integid;
 
+    protected $_isSetupTests = false;
+
     public function __construct($runner, $integid)
     {
         $this->_runner = $runner;
@@ -110,6 +112,12 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
             $ret = $this->_postRun() ? $ret : false;
             return $ret;
         }
+    }
+
+    public function runSetupTests($testsFilter)
+    {
+        $this->_isSetupTests = true;
+        return $this->_runTests($testsFilter);
     }
 
     public function setup()

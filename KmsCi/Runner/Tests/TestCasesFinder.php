@@ -43,7 +43,8 @@ class KmsCi_Runner_Tests_TestCasesFinder {
             if ($this->_isTestDir($dir)) {
                 $fn = $dir->getPath().'/'.$dir->getFilename();
                 $fn = $this->_runner->getUtilHelper()->normalizePath($fn);
-                $relfn = str_replace($this->_testCasesRootPath.'/', '', $fn);
+                $testCasesRootPath = rtrim($this->_testCasesRootPath, '/');
+                $relfn = str_replace($testCasesRootPath.'/', '', $fn);
                 $str = file_get_contents($fn);
                 if ($className = $this->_getClassName($str, $relfn)) {
                     $ans[$relfn] = $className;

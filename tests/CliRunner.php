@@ -17,7 +17,7 @@ class KmsCiFramework_CliRunner extends KmsCi_CliRunnerAbstract {
     {
         $ret = parent::_run();
         // make sure the relevant testproj helpers ran
-        if (isset($GLOBALS['RAN_testUnitTestsBootstrap']) && $GLOBALS['RAN_testUnitTestsBootstrap']) {
+        if (isset($GLOBALS['RAN_test']) && $GLOBALS['RAN_test']) {
             $logfile = $this->getConfig('buildPath').'/output/testproj/logs/testUnitTestsBootstrap.log';
             if (!file_exists($logfile)) {
                 $ret = $this->error('did not find '.$logfile);

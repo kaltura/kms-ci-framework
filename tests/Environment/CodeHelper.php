@@ -41,7 +41,11 @@ STRING;
     {
         $path = $this->_runner->getConfig('buildPath').'/testproj';
         if (file_exists($path)) {
-            return $this->_runner->getUtilHelper()->rrmdir($path);
+            if (file_exists($path.'/.build') && !$this->_runner->getUtilHelper()->rrmdir($path.'/.build')) {
+                return false;
+            } else {
+                return $this->_runner->getUtilHelper()->rrmdir($path);
+            }
         } else {
             return true;
         }
