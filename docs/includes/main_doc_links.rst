@@ -1,0 +1,12 @@
+
+* Interested but not sure if you want to commit?
+    Read the :doc:`introduction / executive summary <intro>`
+    
+* New to the concept of continuous integration?
+    Start here - :doc:`introduction to continuous integration concepts <noobs>`
+
+* Familiar with the basic concept and terminology?
+    Start here - :doc:`main project documentation <indepth>`.
+
+* tl;dr
+    Read the :doc:`quickstart <quickstart>`.
