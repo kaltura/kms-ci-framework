@@ -256,10 +256,3 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
-
-def add_pagename_data(app, doctree, docname):
-    import ipdb
-    ipdb.set_trace()
-
-def setup(app):  
-    app.connect('doctree-resolved', add_pagename_data)

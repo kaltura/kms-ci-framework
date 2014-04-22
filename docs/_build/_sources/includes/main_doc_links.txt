@@ -1,6 +1,3 @@
-.. ifconfig:: values['xxx'] != 'yes'
-    
-    NOT INTRO!    
 
 * Interested but not sure if you want to commit?
     Read the :doc:`introduction / executive summary <intro>`

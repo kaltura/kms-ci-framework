@@ -1,0 +1,34 @@
+Introduction to continuous integration
+======================================
+
+Continuous integration (CI) is a process which has the potential to solve many problems in the typical software development process of large projects:
+
+Stepping on each other's toes
+-----------------------------
+
+When working on a large project with many components, a change to one component might inadvertently change another component. This is a serious problem especially when several developer work together and might change each other's code in unexpected ways.
+
+Each developer in a team usually works on a separate component which might affect other component in unexpected ways. The CI process can test the code on every commit and this makes sure the changes a developer made to a certain component do no affect other components in the code base.
+
+
+* A good testing suite takes a long time to run -
+    Using a continuous integration system the testing suite is run on a dedicated server in the background while the developer can continue developement. The continuous integration server can be configured to send alerts if a build has failed.
+
+* "It works on my machine" -
+    This is a common response when someone complains about a bug which you can't reproduce. Usually the cause for this type of bugs is different configurations / versions. Using a continuous integration system you can make sure all developers work on exactly the same configuration and environment. Also, you can test with different environments and configurations to detect these type of bugs early.
+
+Some of the solutions:
+
+* Unit testing
+    Automated tests which verify the validity of your code.
+
+* Integration testing
+    Automated tests which test the application as a whole, including external dependencies.
+
+* Consistent environment
+    All the developers should be able to work on the same configurations and environments.
+
+* Build automation
+    To provide a consistent environment - there should be a single command that will automatically build the required environment and configuration.
+
+When trying to implement a CI process for your project the most important part is the automated testing (unit and integration tests). Without automated tests

@@ -1,10 +1,7 @@
 Introduction / Executive summary
 ================================
 
-Introduction to continuous integration
---------------------------------------
-
-.. include:: includes/ci_problems.rst
+Continuous integration (CI) is a set of processes and methodologies that has the potential to solve many problems in the typical software development process of large projects incorporating a team of developers.
 
 Introduction to kms-ci-framework
 --------------------------------
@@ -30,4 +27,11 @@ Features
 Interested?
 -----------
 
-.. include:: includes/main_doc_links.rst
+* Want to learn more about the concept of continuous integration?
+    :doc:`introduction to continuous integration concepts <noobs>`
+
+* Want to dive into the detailed documentation?
+    :doc:`main project documentation <indepth>`.
+
+* tl;dr
+    Read the :doc:`quickstart guide <quickstart>`.
