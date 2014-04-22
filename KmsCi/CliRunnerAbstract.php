@@ -226,7 +226,12 @@ abstract class KmsCi_CliRunnerAbstract {
 
     protected function _runIntegrationsRemote()
     {
-
+        return $this->_runRunner(
+            'integrations-remote',
+            'Running remote integration tests',
+            'KmsCi_Runner_IntegrationTests',
+            array('isRemote' => true)
+        );
     }
 
     protected function _runSetup()
@@ -236,7 +241,12 @@ abstract class KmsCi_CliRunnerAbstract {
 
     protected function _setupIntegration()
     {
-        return $this->_runRunner('setup-integration', 'Setting up integration '.$this->getArg('setup-integration'), 'KmsCi_Runner_IntegrationTests', true);
+        return $this->_runRunner(
+            'setup-integration',
+            'Setting up integration '.$this->getArg('setup-integration'),
+            'KmsCi_Runner_IntegrationTests',
+            array('isSetupIntegration' => true)
+        );
     }
 
     protected function _runRestore()

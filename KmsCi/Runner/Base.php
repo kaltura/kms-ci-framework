@@ -14,6 +14,6 @@ abstract class KmsCi_Runner_Base {
         $this->_runner = $runner;
     }
 
-    abstract public function run();
+    abstract public function run($params = array());
 
 }

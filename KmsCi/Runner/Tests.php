@@ -39,7 +39,7 @@ class KmsCi_Runner_Tests extends KmsCi_Runner_Base {
 
     /**********************************************************/
 
-    public function run()
+    public function run($params = array())
     {
         if (empty($this->_testsPath)) {
             return true;

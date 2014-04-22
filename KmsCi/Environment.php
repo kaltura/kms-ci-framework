@@ -26,6 +26,8 @@ class KmsCi_Environment {
                 return new KmsCi_Environment_PhantomHelper($this->_runner);
             case 'util':
                 return new KmsCi_Environment_UtilHelper($this->_runner);
+            case 'casper':
+                return new KmsCi_Environment_CasperHelper($this->_runner);
             default:
                 return null;
         }

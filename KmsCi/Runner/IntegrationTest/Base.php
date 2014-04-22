@@ -19,9 +19,28 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
         $this->_integid = $integid;
     }
 
-    protected function _getOutputPath()
+    public function getOutputPath()
     {
         return $this->_runner->getConfig('outputPath').'/'.$this->_integid;
+    }
+
+    public function getAbsoluteUrl($relurl)
+    {
+        // should be implemented in extending classes, if needed
+        return $relurl;
+    }
+
+    public function getRunner()
+    {
+        return $this->_runner;
+    }
+
+    // usually you will just do "return __DIR__;" here
+    abstract public function getIntegrationPath();
+
+    public function getIntegrationFilename($filename)
+    {
+        return $this->getIntegrationPath().'/'.$filename;
     }
 
     protected function _copyLogs()
@@ -29,7 +48,7 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
         /** @var KmsCi_Environment_LogsHelper $logsHelper */
         $logsHelper = $this->_runner->getEnvironment()->getHelper('logs');
         if (!is_null($logsHelper)) {
-            $destPath = $this->_getOutputPath().'/logs';
+            $destPath = $this->getOutputPath().'/logs';
             echo "Copying logs to {$destPath}\n";
             return $logsHelper->copyTo($destPath);
         } else {
@@ -40,31 +59,31 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
     protected function _initDirectories()
     {
         return (
-            $this->_runner->getUtilHelper()->softMkdir($this->_getOutputPath().'/screenshots')
-            && $this->_runner->getUtilHelper()->softMkdir($this->_getOutputPath().'/dump')
-            && $this->_runner->getUtilHelper()->softMkdir($this->_getOutputPath().'/logs')
-            && $this->_runner->getUtilHelper()->softMkdir($this->_getOutputPath().'/tmp')
+            $this->_runner->getUtilHelper()->softMkdir($this->getOutputPath().'/screenshots')
+            && $this->_runner->getUtilHelper()->softMkdir($this->getOutputPath().'/dump')
+            && $this->_runner->getUtilHelper()->softMkdir($this->getOutputPath().'/logs')
+            && $this->_runner->getUtilHelper()->softMkdir($this->getOutputPath().'/tmp')
         );
     }
 
     protected function _clearDirectoriesContent()
     {
-        foreach (glob($this->_getOutputPath().'/screenshots/*') as $fn) {
+        foreach (glob($this->getOutputPath().'/screenshots/*') as $fn) {
             if (!unlink($fn)) {
                 return false;
             }
         }
-        foreach (glob($this->_getOutputPath().'/dump/*') as $fn) {
+        foreach (glob($this->getOutputPath().'/dump/*') as $fn) {
             if (!unlink($fn)) {
                 return false;
             }
         }
-        foreach (glob($this->_getOutputPath().'/logs/*') as $fn) {
+        foreach (glob($this->getOutputPath().'/logs/*') as $fn) {
             if (!unlink($fn)) {
                 return false;
             }
         }
-        foreach (glob($this->_getOutputPath().'/tmp/*') as $fn) {
+        foreach (glob($this->getOutputPath().'/tmp/*') as $fn) {
             if (!unlink($fn)) {
                 return false;
             }
@@ -74,7 +93,7 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
 
     protected function _postRun() {
         return (
-            $this->_runner->getEnvironment()->invoke('IntegrationTest::_postRun', array($this->_integid))
+            $this->_runner->getEnvironment()->invoke('IntegrationTest::_postRun', array($this->_integid, $this))
             && $this->_copyLogs()
         );
     }
@@ -122,7 +141,7 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
 
     public function setup()
     {
-        $ret = $this->_runner->getEnvironment()->invoke('IntegrationTest::setup', array($this->_integid));
+        $ret = $this->_runner->getEnvironment()->invoke('IntegrationTest::setup', array($this->_integid, $this));
         if (!$ret) {
             return $this->_runner->error('failed to do initial setting up of environment for integration');
         } elseif (!$this->_initDirectories()) {
