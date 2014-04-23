@@ -110,7 +110,7 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
                         $ret = false;
                     }
                 } else {
-                    echo $methodname.": skipped\n";
+                    //echo $methodname.": skipped\n";
                 }
             }
         }

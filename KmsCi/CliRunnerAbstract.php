@@ -16,8 +16,8 @@ abstract class KmsCi_CliRunnerAbstract {
 
     public function __construct($config, $args)
     {
-        $this->_config = $config;
         $this->_args = $this->_parseArgs($args);
+        $this->_config = $this->_overrideConfig($config);
         $this->_environment = $this->_getNewEnvironment();
     }
 
@@ -39,6 +39,7 @@ abstract class KmsCi_CliRunnerAbstract {
             'm' => 'remote',
             'b' => 'build',
             'q' => 'qunit',
+            'o' => 'override',
         );
     }
 
@@ -64,6 +65,8 @@ abstract class KmsCi_CliRunnerAbstract {
                     "  -c, --clear                  clear the environment",
                 'restore' =>
                     "  -r, --restore                restore the environment (after setup or setup-integration)",
+                'override' =>
+                    " -oKEY=VAL, --override KEY=VAL override a configuration value (can be set multiple times)",
             ),
             'test-filtering' => array('Test filtering',
                 'filter' =>
@@ -93,6 +96,28 @@ abstract class KmsCi_CliRunnerAbstract {
         );
     }
 
+    protected function _parseArgSet($arr, $key, $val)
+    {
+        if (isset($arr[$key])) {
+            if (is_array($arr[$key])) {
+                if (is_array($val)) {
+                    $arr[$key] = array_merge($arr[$key], $val);
+                } else {
+                    $arr[$key][] = $val;
+                }
+            } else {
+                if (is_array($val)) {
+                    $arr[$key] = array_merge(array($arr[$key]), $val);
+                } else {
+                    $arr[$key] = array($arr[$key], $val);
+                }
+            }
+        } else {
+            $arr[$key] = $val;
+        }
+        return $arr;
+    }
+
     protected function _parseArgs($args)
     {
         $longKeys = array();
@@ -106,9 +131,11 @@ abstract class KmsCi_CliRunnerAbstract {
                 if (!empty($lastLongKey)) $longKeys[$lastLongKey] = true;
                 $lastLongKey = '';
                 $shortVal = substr($arg, 2);
-                $shortKeys[substr($arg, 1, 1)] = ($shortVal === false) ? true : $shortVal;
+                $shortKeys = $this->_parseArgSet($shortKeys, substr($arg, 1, 1), ($shortVal === false) ? true : $shortVal);
             } else {
-                if (!empty($lastLongKey)) $longKeys[$lastLongKey] = $arg;
+                if (!empty($lastLongKey)) {
+                    $longKeys = $this->_parseArgSet($longKeys, $lastLongKey, $arg);
+                }
                 $lastLongKey = '';
             }
         }
@@ -118,12 +145,27 @@ abstract class KmsCi_CliRunnerAbstract {
         $shortKeysToLongKeys = $this->_getShortKeysToLongKeys();
         foreach ($shortKeys as $key=>$val) {
             if (isset($shortKeysToLongKeys[$key])) {
-                $longKeys[$shortKeysToLongKeys[$key]] = $val;
+                $longKeys = $this->_parseArgSet($longKeys, $shortKeysToLongKeys[$key], $val);
             } else {
-                $longKeys[$key] = $val;
+                $longKeys = $this->_parseArgSet($longKeys, $key, $val);
             }
         }
         return $longKeys;
+    }
+
+    protected function _overrideConfig($config)
+    {
+        if (isset($this->_args['override']) && !empty($this->_args['override'])) {
+            $override = $this->_args['override'];
+            if (!is_array($override)) {
+                $override = array($override);
+            }
+            foreach ($override as $tmp) {
+                list($key, $val) = explode('=', $tmp);
+                $config[$key] = $val;
+            }
+        }
+        return $config;
     }
 
     public function isArg($key)
@@ -236,7 +278,7 @@ abstract class KmsCi_CliRunnerAbstract {
 
     protected function _runSetup()
     {
-
+        return $this->_environment->invoke('CliRunner::_runSetup');
     }
 
     protected function _setupIntegration()
@@ -256,7 +298,7 @@ abstract class KmsCi_CliRunnerAbstract {
 
     protected function _runBuild()
     {
-
+        return $this->_environment->invoke('CliRunner::_runBuild');
     }
 
     protected function _run()

@@ -4,7 +4,7 @@
  * To learn more: http://corp.kaltura.com/Products/Video-Applications/Kaltura-Mediaspace-Video-Portal
  */
 
-class KmsCi_Runner_IntegrationTest_BaseRemote extends KmsCi_Runner_IntegrationTest_Base
+abstract class KmsCi_Runner_IntegrationTest_BaseRemote extends KmsCi_Runner_IntegrationTest_Base
 {
 
     public function setup()

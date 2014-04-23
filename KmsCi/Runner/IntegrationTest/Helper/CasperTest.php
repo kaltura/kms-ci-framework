@@ -13,7 +13,7 @@ class KmsCi_Runner_IntegrationTest_Helper_CasperTest extends KmsCi_Runner_Integr
             $dumpName = $testName;
         }
         $logDumpFilename = $this->_integration->getOutputPath().'/dump/'.$dumpName.'.casper.log';
-        $jsFilename = $this->_integration->getIntegrationFilename($dumpName.'.casper.js');
+        $jsFilename = $this->_integration->getIntegrationFilename($testName.'.casper.js');
         if ($this->_runner->getEnvironment()->getHelper('casper')->test($jsFilename, $logDumpFilename, $params)) {
             return $this->_runner->log(' OK');
         } else {

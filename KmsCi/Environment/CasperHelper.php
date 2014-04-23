@@ -27,7 +27,6 @@ class KmsCi_Environment_CasperHelper extends KmsCi_Environment_BaseHelper {
             file_put_contents($logDumpFilename, $output);
             return true;
         } else {
-            echo " casper test failed\n";
             echo $cmd."\n";
             echo implode("\n", $output);
             return false;

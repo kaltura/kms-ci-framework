@@ -14,6 +14,7 @@ abstract class KmsCi_Environment_LogsHelper extends KmsCi_Environment_BaseHelper
     {
         switch ($evtName) {
             case 'IntegrationTest::setup':
+            case 'CliRunner::_runSetup':
                 return $this->clear();
             default:
                 return parent::invoke($evtName, $evtParams);

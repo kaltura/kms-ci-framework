@@ -16,6 +16,7 @@ abstract class KmsCi_Environment_CacheHelper extends KmsCi_Environment_BaseHelpe
         switch ($evtName) {
             case 'IntegrationTest::setup':
             case 'CliRunner::_runRestore':
+            case 'CliRunner::_runSetup':
                 return $this->clear();
             default:
                 return parent::invoke($evtName, $evtParams);

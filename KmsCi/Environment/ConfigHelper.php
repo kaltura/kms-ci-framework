@@ -15,6 +15,7 @@ abstract class KmsCi_Environment_ConfigHelper extends KmsCi_Environment_BaseHelp
         switch ($evtName) {
             case 'IntegrationTest::setup':
             case 'IntegrationTest::_postRun':
+            case 'CliRunner::_runSetup':
                 return $this->remove();
             case 'CliRunner::_runRestore':
                 return $this->restore();
