@@ -1,5 +1,5 @@
-Welcome to kms-ci-framework's documentation!
-============================================
+Welcome to kms-ci-framework!
+============================
 
 Kms-ci-framework provides tools and methdologies for continuous integration and unit/integration testing.
 
@@ -13,6 +13,3 @@ It was originally written to support `Kaltura Mediaspace™ <http://corp.kaltura
 
 * Familiar with the basic concept and terminology?
     Start here - :doc:`main project documentation <indepth>`.
-
-* tl;dr
-    Read the :doc:`quickstart guide <quickstart>`.

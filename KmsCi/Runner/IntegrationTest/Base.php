@@ -35,8 +35,11 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
         return $this->_runner;
     }
 
-    // usually you will just do "return __DIR__;" here
-    abstract public function getIntegrationPath();
+    public function getIntegrationPath()
+    {
+        // usually you will just do "return __DIR__;" here
+        throw new Exception('You should implement the getIntegrationPath method to return a path where extra required files exist');
+    }
 
     public function getIntegrationFilename($filename)
     {

@@ -32,6 +32,3 @@ Interested?
 
 * Want to dive into the detailed documentation?
     :doc:`main project documentation <indepth>`.
-
-* tl;dr
-    Read the :doc:`quickstart guide <quickstart>`.

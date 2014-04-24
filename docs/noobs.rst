@@ -1,7 +1,7 @@
 Introduction to continuous integration
 ======================================
 
-If you are new to the concept of continuous integration you should start reading here. If you have some prior experience you might want to skip ahead to the :doc:`full documentation guide <indepth>` or the :doc:`quickstart guide <quickstart>`.
+If you are new to the concept of continuous integration you should start reading here. If you have some prior experience you might want to skip ahead to the :doc:`full documentation guide <indepth>`.
 
 When working on a large project with many components, a change to one component might inadvertently change another component. This is a serious problem especially when several developer work together and might change each other's code in unexpected ways.
 
@@ -34,4 +34,3 @@ Dive into Kms-ci-framework
 --------------------------
 
 * :doc:`The full documentation guide <indepth>`
-* :doc:`The quickstart guide <quickstart>`

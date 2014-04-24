@@ -7,6 +7,8 @@
 class KmsCi_Runner_IntegrationTest_Helper_Screenshot extends KmsCi_Runner_IntegrationTest_Helper_Base
 {
 
+    protected $_lastHtmlContent;
+
     protected function _isHtmlError($str)
     {
         return (
@@ -22,9 +24,13 @@ class KmsCi_Runner_IntegrationTest_Helper_Screenshot extends KmsCi_Runner_Integr
 
     public function get($relurl, $width, $height, $basefilename)
     {
+        $this->_lastHtmlContent = null;
         if (!parse_url($relurl, PHP_URL_HOST)) {
             // it's a relative url
             $url = $this->_integration->getAbsoluteUrl($relurl);
+            if (!parse_url($url, PHP_URL_HOST)) {
+                throw new Exception('your integration class should define the getAbsoluteUrl method');
+            }
         } else {
             $url = $relurl;
         }
@@ -32,11 +38,19 @@ class KmsCi_Runner_IntegrationTest_Helper_Screenshot extends KmsCi_Runner_Integr
         $htmlfile = $this->_integration->getOutputPath().'/dump/'.$basefilename.'.html';
         if (!$this->_phantomGetScreenshot($url, $width, $height, $pngfile, $htmlfile)) {
             return $this->_runner->error(' FAILED!');
-        } elseif ($this->_isHtmlError(file_get_contents($htmlfile))) {
-            return $this->_runner->error(' FAILED - detected error in html dump');
         } else {
-            return $this->_runner->log(' OK');
+            $this->_lastHtmlContent = file_get_contents($htmlfile);
+            if ($this->_isHtmlError($this->_lastHtmlContent)) {
+                return $this->_runner->error(' FAILED - detected error in html dump');
+            } else {
+                return $this->_runner->log(' OK');
+            }
         }
+    }
+
+    public function getLastHtmlContent()
+    {
+        return $this->_lastHtmlContent;
     }
 
 }
