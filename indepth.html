@@ -1,0 +1,572 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Full documentation guide &mdash; kms-ci-framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="kms-ci-framework 0.1 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="index.html">kms-ci-framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="full-documentation-guide">
+<h1>Full documentation guide<a class="headerlink" href="#full-documentation-guide" title="Permalink to this headline">¶</a></h1>
+<p>This guide will detail the concepts and methodologies that Kms-ci-framework implements. It should be possible to follow this guide without using the Kms-ci-framework code itself, it can be used as a generic guide to CI processes and methodologies.</p>
+<p>Before starting this guide you should be familiar with <a class="reference internal" href="noobs.html"><em>Basic continuous integration concepts</em></a>.</p>
+<div class="section" id="the-sample-project">
+<h2>The sample project<a class="headerlink" href="#the-sample-project" title="Permalink to this headline">¶</a></h2>
+<p>During this guide we will write tests for a sample project - a personal C.V. website written in php. Kms-ci-framework is written in php so php knowledge is required to use it. However, you may still follow along this guide without using php or the Kms-ci-framework.</p>
+<p>We will develope the project using TDD methodology - where we will write the tests first.</p>
+</div>
+<div class="section" id="setting-up-kms-ci-framework-for-our-project">
+<h2>Setting up kms-ci-framework for our project<a class="headerlink" href="#setting-up-kms-ci-framework-for-our-project" title="Permalink to this headline">¶</a></h2>
+<p>If you are not going to use Kms-ci-framework you can skip to next section: <a class="reference internal" href="#the-frontpage">the frontpage</a>.</p>
+<p>You should install Kms-ci-framework first, see the <a class="reference internal" href="install.html"><em>installation guide</em></a>.</p>
+<p>Start by creating a directory for our project:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ mkdir cv
+$ cd cv
+</pre></div>
+</div>
+<p>Using TDD methodology we write code only to let some test pass. So, the first &#8220;test&#8221; is to run the kms-ci-framework code:</p>
+<div class="highlight-python"><div class="highlight"><pre>cv$ kmsci
+</pre></div>
+</div>
+<p>You will get an error along these lines: &#8220;CliRunnerFile configuration key does not exist&#8221;</p>
+<p>Kms-ci-framework scans for configuration files in your current directory. It looks for a file called &#8220;kmsci.conf.php&#8221;. Let&#8217;s create that file now:</p>
+<div class="highlight-python"><div class="highlight"><pre>cv$ touch kmsci.conf.php
+</pre></div>
+</div>
+<p>And, using your favorite editor, input the following content:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;?php
+$config = array(
+    &#39;CliRunnerFile&#39; =&gt; __DIR__.&#39;/CliRunner.php&#39;,
+);
+</pre></div>
+</div>
+<p>After running &#8220;kmsci&#8221; you will get an error: &#8220;The file defined in CliRunnerFile does not exist&#8221;. Let&#8217;s create that file:</p>
+<div class="highlight-python"><div class="highlight"><pre>cv$ touch CliRunner.php
+</pre></div>
+</div>
+<p>After running &#8220;kmsci&#8221; You will get an error: &#8220;CliRunnerClass configuration key does not exist&#8221;. Let&#8217;s add it to kmsci.conf.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&#39;CliRunnerClass&#39; =&gt; &#39;CliRunner&#39;,
+</pre></div>
+</div>
+<p>After running &#8220;kmsci&#8221; You will get an error: &#8220;The class defined in CliRunnerClass does not exist&#8221;. Let&#8217;s define it - edit CliRunner.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;?php
+
+class CliRunner extends KmsCi_CliRunnerAbstract {}
+</pre></div>
+</div>
+<p>KmsCi_CliRunnerAbstract is the main class of Kms-ci-framework. It will be defined (along with all the kms-ci-framework classes) when you run kmsci.</p>
+<p>Now, when you run &#8220;kmsci&#8221; you will get the default Kms-ci-framework help message.</p>
+</div>
+<div class="section" id="the-frontpage">
+<h2>The frontpage<a class="headerlink" href="#the-frontpage" title="Permalink to this headline">¶</a></h2>
+<p>The first test we will run is to see if the frontpage web page is accessible. We do this using an integration test. We will do just the most minimal test that checks that when accessing the web page we get a 200 http status. This just makes sure everything is configured properly.</p>
+</div>
+<div class="section" id="setting-up-kms-ci-framework-to-run-integration-tests">
+<h2>Setting up kms-ci-framework to run integration tests<a class="headerlink" href="#setting-up-kms-ci-framework-to-run-integration-tests" title="Permalink to this headline">¶</a></h2>
+<p>If you are not using kms-ci-framework you can skip to the next section: <a class="reference internal" href="#writing-a-screenshot-test-for-the-frontpage">Writing a screenshot test for the frontpage</a>.</p>
+<p>To run integration tests in kms-ci-framework we pass the -i (or &#8211;integrations) parameter:</p>
+<div class="highlight-python"><div class="highlight"><pre>cv$ kmsci -i
+</pre></div>
+</div>
+<p>You will get a warning: &#8220;WARNING: no integrationTestsPath&#8221; but the test will pass (because there aren&#8217;t any tests).</p>
+<p>Let&#8217;s create our main tests directory, and inside that our integration tests directory:</p>
+<div class="highlight-python"><div class="highlight"><pre>cv$ mkdir tests
+cv$ mkdir tests/integrations
+</pre></div>
+</div>
+<p>Now, we need to let kms-ci-framework know where the integration tests are located, add the following to kmsci.conf.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&#39;integrationTestsPath&#39; =&gt; __DIR__.&#39;/tests/integrations&#39;,
+</pre></div>
+</div>
+<p>Inside this integrations directory we can have several integration classes and each class can contain several tests. For now, we will just create a &#8220;main&#8221; integration:</p>
+<div class="highlight-python"><div class="highlight"><pre>cv$ mkdir tests/integrations/main
+</pre></div>
+</div>
+<p>Each integration directory must have a main.php file with the integration class - tests/integrations/main/main.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;?php
+
+class IntegrationTests_main extends KmsCi_Runner_IntegrationTest_Base {
+
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="writing-a-screenshot-test-for-the-frontpage">
+<h2>Writing a screenshot test for the frontpage<a class="headerlink" href="#writing-a-screenshot-test-for-the-frontpage" title="Permalink to this headline">¶</a></h2>
+<p>Now, let&#8217;s add our test method - this method will just try to get a screenshot of the frontpage:</p>
+<div class="highlight-python"><div class="highlight"><pre>public function testFrontpage()
+{
+    $helper = new KmsCi_Runner_IntegrationTest_Helper_Screenshot($this);
+    return $helper-&gt;get(&#39;/&#39;, 1024, 768, &#39;frontpage&#39;);
+}
+</pre></div>
+</div>
+<p>Kms-ci-framework provides helpers for running common testing functionality. In this case we use the screenshot helper. This helper uses phantomjs to get the screenshot.</p>
+<p>This helper will detect if there is an http or php error when accessing the page and will also store a dump of the html received, http header and a screenshot of the page.</p>
+</div>
+<div class="section" id="setting-up-kms-ci-framework-to-run-the-screenshot-helper">
+<h2>Setting up kms-ci-framework to run the screenshot helper<a class="headerlink" href="#setting-up-kms-ci-framework-to-run-the-screenshot-helper" title="Permalink to this headline">¶</a></h2>
+<p>You can skip to the next section if you are not using kms-ci-framework: <a class="reference internal" href="#testing-the-frontpage-content">Testing the frontpage content</a>.</p>
+<p>Now, when you run &#8220;kmsci -i&#8221; you will get an exception: &#8216;key &#8220;outputPath&#8221; must be set in the configuration!&#8217;. The outputPath configuration is where all the output of the different tests will be stored (log file, html dumps, screenshots etc.). Let&#8217;s define it in kmsci.conf.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&#39;outputPath&#39; =&gt; __DIR__.&#39;/.output&#39;,
+</pre></div>
+</div>
+<p>And, we should also create this directory (when using source control, it should also be ignored):</p>
+<div class="highlight-python"><div class="highlight"><pre>cv$ mkdir .output
+</pre></div>
+</div>
+<p>Now, when running &#8220;kmsc -i&#8221; you will get another exception: &#8220;your integration class should define the getAbsoluteUrl method&#8221;. The getAbsoluteUrl method is required to run the screenshot helper. It converts a relative url to absolute url. Let&#8217;s define it, in tests/integrations/main/main.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>public function getAbsoluteUrl($relativeUrl)
+{
+    return $this-&gt;_runner-&gt;getConfig(&#39;baseUrl&#39;).$relativeUrl;
+}
+</pre></div>
+</div>
+<p>In this case we get a configuration key called &#8216;baseUrl&#8217; from the main runner. This key should be defined in the configuration but it should not be in source control as part of the project (because it might be differente on different machines). To set local configuration you can create a file kmsci.conf.local.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;?php
+
+$config = array(
+    &#39;baseUrl&#39; =&gt; &#39;http://cvproject&#39;,
+);
+</pre></div>
+</div>
+<p>This configuration will be merged with the main configuration in kmsci.conf.php. Of course, you will have to setup a webserver at the relevant domain that will serve files from your cv directory.</p>
+<p>Also, to detect errors in the html source code, the screenshot helper needs to know the full root path of your project, add the following in kmsc.conf.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&#39;rootPath&#39; =&gt; __DIR__,
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing-the-frontpage-content">
+<h2>Testing the frontpage content<a class="headerlink" href="#testing-the-frontpage-content" title="Permalink to this headline">¶</a></h2>
+<p>After setting up the basic frontpage test, when we run &#8220;kmsci -i&#8221; the test might pass, so let&#8217;s check if there is any relevant content in the page. tests/integrations/main/main.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>public function testFrontpage()
+{
+    $helper = new KmsCi_Runner_IntegrationTest_Helper_Screenshot($this);
+    if (!$helper-&gt;get(&#39;/&#39;, 1024, 768, &#39;frontpage&#39;)) {
+        return false;
+    } elseif (strpos($helper-&gt;getLastHtmlContent(), &#39;Welcome to the frontpage of the test CV project!&#39;) === false) {
+        return $this-&gt;_runner-&gt;error(&#39; FAILED - expected content was not found&#39;);
+    } else {
+        return true;
+    }
+}
+</pre></div>
+</div>
+<p>Now, we run the test again and it will fail. So, let&#8217;s create the minimal code to let the test pass, create index.html:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;html&gt;
+    &lt;head&gt;&lt;/head&gt;
+    &lt;body&gt;
+        &lt;h1&gt;Welcome to the frontpage of the test CV project!&lt;/h1&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</pre></div>
+</div>
+<p>Now the test will pass.</p>
+</div>
+<div class="section" id="adding-some-more-functionality-using-casperjs">
+<h2>Adding some more functionality - using CasperJS<a class="headerlink" href="#adding-some-more-functionality-using-casperjs" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s add a select box on our frontpage which will magically change the text. This select box will have the following options:</p>
+<ul class="simple">
+<li>Summary (the default option)</li>
+<li>Education</li>
+<li>Languages</li>
+</ul>
+<p>We will write the test first.</p>
+<p>To test webpage functionality we use <a class="reference external" href="http://casperjs.org/">CasperJS</a>. Let&#8217;s write a test in tests/integrations/main/frontpageTest.casper.js:</p>
+<div class="highlight-python"><div class="highlight"><pre>// we must pass this parameter to casper when running the test - this is the url we will access
+var url = casper.cli.get(&#39;url&#39;);
+
+casper.test.begin(&#39;changing selectbox on frontpage will change the text&#39;, 9, function suite(test) {
+    casper.start(url).then(function(){
+        // default selection is Summary
+        test.assertSelectorHasText(&#39;#selboxtext&#39;, &#39;Summary&#39;);
+        // it&#39;s important to ensure that the other section&#39;s text does not appear
+        test.assertSelectorDoesntHaveText(&#39;#selboxtext&#39;, &#39;Education&#39;);
+        test.assertSelectorDoesntHaveText(&#39;#selboxtext&#39;, &#39;Languages&#39;);
+        casper.evaluate(function(){
+            $(&#39;#selbox&#39;).val(&#39;education&#39;).change();
+        });
+        test.assertSelectorDoesntHaveText(&#39;#selboxtext&#39;, &#39;Summary&#39;);
+        test.assertSelectorHasText(&#39;#selboxtext&#39;, &#39;Education&#39;);
+        test.assertSelectorDoesntHaveText(&#39;#selboxtext&#39;, &#39;Languages&#39;);
+        casper.evaluate(function(){
+            $(&#39;#selbox&#39;).val(&#39;languages&#39;).change();
+        });
+        test.assertSelectorDoesntHaveText(&#39;#selboxtext&#39;, &#39;Summary&#39;);
+        test.assertSelectorDoesntHaveText(&#39;#selboxtext&#39;, &#39;Education&#39;);
+        test.assertSelectorHasText(&#39;#selboxtext&#39;, &#39;Languages&#39;);
+    });
+    casper.run(function(){
+        test.done();
+    });
+});
+</pre></div>
+</div>
+<p>Now, let&#8217;s run it with casperjs:</p>
+<div class="highlight-python"><div class="highlight"><pre>cv$ casperjs test tests/integrations/main/frontpageTest.casper.js --url=(The full url to your local cvproject domain)
+</pre></div>
+</div>
+<p>Of course, it will fail, let&#8217;s implement the relevant code in index.html:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;html&gt;
+    &lt;head&gt;
+        &lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;h1&gt;Welcome to the frontpage of the test CV project!&lt;/h1&gt;
+        &lt;select id=&#39;selbox&#39;&gt;
+            &lt;option value=&#39;summary&#39; selected&gt;Summary&lt;/option&gt;
+            &lt;option value=&#39;education&#39;&gt;Education&lt;/option&gt;
+            &lt;option value=&#39;languages&#39;&gt;Languages&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;div id=&#39;selboxtext&#39;&gt;
+            Summary of my CV
+        &lt;/div&gt;
+        &lt;script&gt;
+            $(function(){
+                $(&#39;#selbox&#39;).on(&#39;change&#39;, function(){
+                switch ($(this).val()) {
+                    case &#39;education&#39;:
+                    $(&#39;#selboxtext&#39;).html(&#39;My Education&#39;);break;
+                    case &#39;languages&#39;:
+                    $(&#39;#selboxtext&#39;).html(&#39;My Languages&#39;);break;
+                    default:
+                    $(&#39;#selboxtext&#39;).html(&#39;Summary of my CV&#39;);break;
+                };
+                });
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</pre></div>
+</div>
+<p>Now, run the test again and it will pass.</p>
+</div>
+<div class="section" id="integrating-the-casper-test-with-kms-ci-framework">
+<h2>Integrating the casper test with kms-ci-framework<a class="headerlink" href="#integrating-the-casper-test-with-kms-ci-framework" title="Permalink to this headline">¶</a></h2>
+<p>You can skip to the next section if you are not using kms-ci-framework: <a class="reference internal" href="#refactor-using-qunit">Refactor - using qunit</a>.</p>
+<p>Now, let&#8217;s integrate this test into our integration test. Edit tests/integrations/main/main.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>public function testFrontpageSelbox()
+{
+    $helper = new KmsCi_Runner_IntegrationTest_Helper_CasperTest($this);
+    return $helper-&gt;test(&#39;frontpageTest&#39;, &#39;frontpage&#39;, array(&#39;url&#39; =&gt; $this-&gt;getAbsoluteUrl(&#39;/&#39;)));
+}
+</pre></div>
+</div>
+<p>Now, run &#8220;kmsci -i&#8221; - you will get an error: &#8220;You should implement the getIntegrationPath method to return a path where extra required files exist&#8221;. This is a method that returns the path where kms-ci-framework will search for the casper test. Add it to tests/integrations/main/main.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>public function getIntegrationPath()
+{
+    return __DIR__;
+}
+</pre></div>
+</div>
+<p>Now, run &#8220;kmsci -i&#8221; and all the tests should pass.</p>
+<p>Notice that the casper test included a dump of it&#8217;s output in .output/main/dump/frontpage.casper.log</p>
+</div>
+<div class="section" id="refactor-using-qunit">
+<h2>Refactor - using qunit<a class="headerlink" href="#refactor-using-qunit" title="Permalink to this headline">¶</a></h2>
+<p>When using TDD methodology, when we are satisifed with the tests we should refactor the code. A possible refactoring in this case will be to put all the js code into a separate file.</p>
+<p>We can also unit test this code. To test JS code we use <a class="reference external" href="https://qunitjs.com/">qunit</a>.</p>
+<p>Let&#8217;s write the qunit test in tests/frontpageTest.html:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+    &lt;title&gt;frontpage tests&lt;/title&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;/tests/resources/qunit.css&quot;&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div id=&quot;qunit&quot;&gt;&lt;/div&gt;
+&lt;div id=&quot;qunit-fixture&quot;&gt;&lt;/div&gt;
+&lt;script src=&quot;/tests/resources/qunit.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;/main.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+    test(&quot;frontpage selbox&quot;, function() {
+        ok(getSelboxtext(&#39;summary&#39;).indexOf(&#39;Summary&#39;) &gt; -1);
+        ok(getSelboxtext(&#39;education&#39;).indexOf(&#39;Education&#39;) &gt; -1);
+        ok(getSelboxtext(&#39;languages&#39;).indexOf(&#39;Languages&#39;) &gt; -1);
+    });
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre></div>
+</div>
+<p>Now, to run the tests we just need to access that url (/tests/frontpageTest.html). If your project uses .htaccess or other web server processing you might want to create another virtual host that will serve just the plain html files.</p>
+<p>You will get some 404 errors:</p>
+<div class="highlight-python"><div class="highlight"><pre>GET tests/resources/qunit.css 404 (Not Found) frontpageTest.html:6
+GET tests/resources/qunit.js 404 (Not Found) frontpageTest.html:11
+</pre></div>
+</div>
+<p>the tests/resources/* files are the qunit source files. You can get them from the qunit project or copy them from the kms-ci-framework source under tests/resources/</p>
+<p>After placing those files if you access /tests/frontpageTest.html again you will see the qunit framework html output.</p>
+<p>Our test will fail because we haven&#8217;t separated the js into an external file yet. Let&#8217;s put the relevant js code in /main.js:</p>
+<div class="highlight-python"><div class="highlight"><pre>function getSelboxtext(selboxval) {
+    switch (selboxval) {
+        case &#39;education&#39;:
+            return &#39;My Education&#39;;
+        case &#39;languages&#39;:
+            return &#39;My Languages&#39;;
+        default:
+            return &#39;Summary of my CV&#39;;
+    }
+}
+</pre></div>
+</div>
+<p>Now, access /tests/frontpageTest.html and the tests will pass.</p>
+</div>
+<div class="section" id="setting-up-kms-ci-framework-to-run-the-qunit-test">
+<h2>Setting up kms-ci-framework to run the qunit test<a class="headerlink" href="#setting-up-kms-ci-framework-to-run-the-qunit-test" title="Permalink to this headline">¶</a></h2>
+<p>You can skip this if you are not using kms-ci-framework: <a class="reference internal" href="#making-sure-the-entire-testing-suite-runs-correctly-after-refactoring-frontpage-js">Making sure the entire testing suite runs correctly after refactoring frontpage js</a>.</p>
+<p>Kms-ci-framework automatically detects qunit tests. Just run &#8220;kmsci -q&#8221; - you will get an error &#8220;qunitTestsPath is not configured&#8221;. So, let&#8217;s add that configuration to kmsci.conf.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&#39;qunitTestsPath&#39; =&gt; __DIR__.&#39;/tests&#39;,
+</pre></div>
+</div>
+<p>Now you will get an exception &#8216;key &#8220;qunitWebServerBasePath&#8221; must be set in the configuration!&#8217;. Kms-ci-framework needs to know the full path from where your web server is serving the qunit files. Add it to kmsci.conf.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&#39;qunitWebServerBasePath&#39; =&gt; __DIR__,
+</pre></div>
+</div>
+<p>Now, an exception - &#8216;key &#8220;qunitUrl&#8221; must be set in the configuration!&#8217; - this is the base url that serves the qunit tests. It can be the same as the baseUrl we configured previously in kmsci.conf.local.php but without the http, so just the domain name:</p>
+<div class="highlight-python"><div class="highlight"><pre>&#39;qunitUrl&#39; =&gt; &#39;cvproject&#39;,
+</pre></div>
+</div>
+<p>Now, run the qunit tests &#8220;kmsci -q&#8221; and they should pass.</p>
+</div>
+<div class="section" id="making-sure-the-entire-testing-suite-runs-correctly-after-refactoring-frontpage-js">
+<h2>Making sure the entire testing suite runs correctly after refactoring frontpage js<a class="headerlink" href="#making-sure-the-entire-testing-suite-runs-correctly-after-refactoring-frontpage-js" title="Permalink to this headline">¶</a></h2>
+<p>Now, if we run our integration test it will pass but it still doesn&#8217;t use the new js file we wrote.</p>
+<p>To test it, let&#8217;s change the text of a section. First, change the test tests/frontpage.html:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ok</span><span class="p">(</span><span class="n">getSelboxtext</span><span class="p">(</span><span class="s">&#39;languages&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s">&#39;English, Spanish&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Now, run the qunit test - it will fail. Let&#8217;s fix the code in main.js:</p>
+<div class="highlight-python"><div class="highlight"><pre>case &#39;languages&#39;:
+    return &#39;English, Spanish&#39;;
+</pre></div>
+</div>
+<p>Ok, now, let&#8217;s change the casper test:</p>
+<div class="highlight-python"><div class="highlight"><pre>// default selection is Summary
+test.assertSelectorHasText(&#39;#selboxtext&#39;, &#39;Summary&#39;);
+// it&#39;s important to ensure that the other section&#39;s text does not appear
+test.assertSelectorDoesntHaveText(&#39;#selboxtext&#39;, &#39;Education&#39;);
+test.assertSelectorDoesntHaveText(&#39;#selboxtext&#39;, &#39;English, Spanish&#39;);
+casper.evaluate(function(){
+    $(&#39;#selbox&#39;).val(&#39;education&#39;).change();
+});
+test.assertSelectorDoesntHaveText(&#39;#selboxtext&#39;, &#39;Summary&#39;);
+test.assertSelectorHasText(&#39;#selboxtext&#39;, &#39;Education&#39;);
+test.assertSelectorDoesntHaveText(&#39;#selboxtext&#39;, &#39;English, Spanish&#39;);
+casper.evaluate(function(){
+    $(&#39;#selbox&#39;).val(&#39;languages&#39;).change();
+});
+test.assertSelectorDoesntHaveText(&#39;#selboxtext&#39;, &#39;Summary&#39;);
+test.assertSelectorDoesntHaveText(&#39;#selboxtext&#39;, &#39;Education&#39;);
+test.assertSelectorHasText(&#39;#selboxtext&#39;, &#39;English, Spanish&#39;);
+</pre></div>
+</div>
+<p>The casper test will fail. Now, let&#8217;s make change index.html to use the new main.js file:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;html&gt;
+    &lt;head&gt;
+        &lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;/main.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;h1&gt;Welcome to the frontpage of the test CV project!&lt;/h1&gt;
+    &lt;select id=&#39;selbox&#39;&gt;
+        &lt;option value=&#39;summary&#39; selected&gt;Summary&lt;/option&gt;
+        &lt;option value=&#39;education&#39;&gt;Education&lt;/option&gt;
+        &lt;option value=&#39;languages&#39;&gt;Languages&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;div id=&#39;selboxtext&#39;&gt;
+        Summary of my CV
+    &lt;/div&gt;
+    &lt;script&gt;
+    $(function(){
+        $(&#39;#selbox&#39;).on(&#39;change&#39;, function(){
+            $(&#39;#selboxtext&#39;).html(getSelboxtext($(this).val()));
+        });
+    });
+    &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</pre></div>
+</div>
+<p>Now, if we run the complete testing suite, everything should be OK:</p>
+<div class="highlight-python"><div class="highlight"><pre>cv$ kmsci -a
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-some-php-code">
+<h2>Adding some php code<a class="headerlink" href="#adding-some-php-code" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s add some php code so we can test it using <a class="reference external" href="http://phpunit.de/">PHPUnit</a>.</p>
+<p>We&#8217;ll add some code that returns the days that passed since a certain date. Let&#8217;s write the test in tests/DaysCounterTest.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;?php
+
+require_once(__DIR__.&#39;/../DaysCounter.php&#39;);
+
+class DaysCounterTest extends PHPUnit_Framework_TestCase {
+
+    public function test()
+    {
+        $epoch = mktime(0, 0, 0, 01, 01, 2007);
+        $counter = new DaysCounter($epoch);
+        $this-&gt;assertEquals(round((time()-$epoch) / 86400), $counter-&gt;get());
+    }
+
+}
+</pre></div>
+</div>
+<p>Run this test:</p>
+<div class="highlight-python"><div class="highlight"><pre>cv$ phpunit DaysCounterTest tests/DaysCounterTest.php
+</pre></div>
+</div>
+<p>Of course, it will fail, let&#8217;s write the code in /DaysCounter.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;?php
+
+class DaysCounter
+{
+
+    public function __construct($epoch)
+    {
+        $this-&gt;_epoch = $epoch;
+    }
+
+    public function get()
+    {
+        return round((time()-$this-&gt;_epoch) / 86400);
+    }
+
+}
+</pre></div>
+</div>
+<p>Now the test will pass.</p>
+</div>
+<div class="section" id="setting-up-kms-ci-framework-to-run-the-unit-test">
+<h2>Setting up kms-ci-framework to run the unit test<a class="headerlink" href="#setting-up-kms-ci-framework-to-run-the-unit-test" title="Permalink to this headline">¶</a></h2>
+<p>You can skip to the next section if you are not using kms-ci-framework - <a class="reference internal" href="#adding-the-dayscounter-to-the-frontpage">Adding the DaysCounter to the frontpage</a>.</p>
+<p>Run kmsci with -t parameter to run the unit tests:</p>
+<div class="highlight-python"><div class="highlight"><pre>cv$ kmsci -t
+</pre></div>
+</div>
+<p>You will get an error: &#8220;testsPath is not configured&#8221;. This is the directory where kms-ci-framework will search for tests. Let&#8217;s configure it in kmsci.conf.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&#39;testsPath&#39; =&gt; __DIR__.&#39;/tests&#39;,
+</pre></div>
+</div>
+<p>You will get an error: &#8220;key &#8220;buildPath&#8221; must be set in the configuration!&#8221;. This is a path that kms-ci-framework uses to store build artifacts. Let&#8217;s add it to kmsci.conf.php:</p>
+<div class="highlight-python"><div class="highlight"><pre>&#39;buildPath&#39; =&gt; __DIR__.&#39;/.build&#39;,
+</pre></div>
+</div>
+<p>That&#8217;s it, now the test should work.</p>
+</div>
+<div class="section" id="adding-the-dayscounter-to-the-frontpage">
+<h2>Adding the DaysCounter to the frontpage<a class="headerlink" href="#adding-the-dayscounter-to-the-frontpage" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s change index.html to index.php and add the days counter:</p>
+<div class="highlight-python"><div class="highlight"><pre>Days since last job: &lt;?php
+    require_once(__DIR__.&#39;/DaysCounter.php&#39;);
+    $counter = new DaysCounter(mktime(0, 0, 0, 01, 01, 2007));
+    echo $counter-&gt;get();
+?&gt;
+</pre></div>
+</div>
+<p>Now, even without writing any more tests, our test suite will ensure that there isn&#8217;t an unexpected php error in that code. And also, we can be fairly confident that this addition didn&#8217;t add any regression bugs.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Full documentation guide</a><ul>
+<li><a class="reference internal" href="#the-sample-project">The sample project</a></li>
+<li><a class="reference internal" href="#setting-up-kms-ci-framework-for-our-project">Setting up kms-ci-framework for our project</a></li>
+<li><a class="reference internal" href="#the-frontpage">The frontpage</a></li>
+<li><a class="reference internal" href="#setting-up-kms-ci-framework-to-run-integration-tests">Setting up kms-ci-framework to run integration tests</a></li>
+<li><a class="reference internal" href="#writing-a-screenshot-test-for-the-frontpage">Writing a screenshot test for the frontpage</a></li>
+<li><a class="reference internal" href="#setting-up-kms-ci-framework-to-run-the-screenshot-helper">Setting up kms-ci-framework to run the screenshot helper</a></li>
+<li><a class="reference internal" href="#testing-the-frontpage-content">Testing the frontpage content</a></li>
+<li><a class="reference internal" href="#adding-some-more-functionality-using-casperjs">Adding some more functionality - using CasperJS</a></li>
+<li><a class="reference internal" href="#integrating-the-casper-test-with-kms-ci-framework">Integrating the casper test with kms-ci-framework</a></li>
+<li><a class="reference internal" href="#refactor-using-qunit">Refactor - using qunit</a></li>
+<li><a class="reference internal" href="#setting-up-kms-ci-framework-to-run-the-qunit-test">Setting up kms-ci-framework to run the qunit test</a></li>
+<li><a class="reference internal" href="#making-sure-the-entire-testing-suite-runs-correctly-after-refactoring-frontpage-js">Making sure the entire testing suite runs correctly after refactoring frontpage js</a></li>
+<li><a class="reference internal" href="#adding-some-php-code">Adding some php code</a></li>
+<li><a class="reference internal" href="#setting-up-kms-ci-framework-to-run-the-unit-test">Setting up kms-ci-framework to run the unit test</a></li>
+<li><a class="reference internal" href="#adding-the-dayscounter-to-the-frontpage">Adding the DaysCounter to the frontpage</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/indepth.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="index.html">kms-ci-framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Ori Hoch, Kaltura.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
