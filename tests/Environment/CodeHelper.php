@@ -1,10 +1,5 @@
 <?php
 /*
- * All Code Confidential and Proprietary, Copyright ©2011 Kaltura, Inc.
- * To learn more: http://corp.kaltura.com/Products/Video-Applications/Kaltura-Mediaspace-Video-Portal
- */
-
-/*
  * This helper sets up a test project for kms-ci-framework which we then test against
  * (it does it only for testproj integration)
  */
