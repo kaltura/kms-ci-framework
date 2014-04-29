@@ -121,6 +121,11 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
         return false;
     }
 
+    public function isSkipRun()
+    {
+        return false;
+    }
+
     public function run()
     {
         if (!$this->setup()) {

@@ -23,6 +23,10 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
                         require_once($mainfn);
                         /** @var KmsCi_Runner_IntegrationTest_Base $tests */
                         $tests = new $clsname($this->_runner, $integid);
+                        // skip integrations
+                        if ($tests->isSkipRun()) {
+                            continue;
+                        }
                         // skip non-remote integration tests
                         if ($isRemote && !$tests->isRemote()) {
                             continue;
