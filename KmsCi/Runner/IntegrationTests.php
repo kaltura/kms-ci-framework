@@ -2,6 +2,49 @@
 
 class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
 
+    protected function _run($integid, $clsname, $isRemote = false)
+    {
+        /** @var KmsCi_Runner_IntegrationTest_Base $tests */
+        $tests = new $clsname($this->_runner, $integid);
+        // skip integrations
+        if ($tests->isSkipRun()) {
+            return;
+        }
+        // skip non-remote integration tests
+        if ($isRemote && !$tests->isRemote()) {
+            return;
+        }
+        // skip remote integration tests
+        if (!$isRemote && $tests->isRemote()) {
+            return;
+        }
+        $filter = $this->_runner->getArg('filter', '');
+        if (empty($filter) || preg_match($filter, $integid) === 1) {
+            echo "{$clsname}: \n";
+            if (!$tests->run()) {
+                $ret = false;
+            }
+        }
+        echo "\n\n";
+    }
+
+    protected function _setup($integId, $clsname)
+    {
+        /** @var KmsCi_Runner_IntegrationTest_Base $tests */
+        $tests = new $clsname($this->_runner, $integId);
+        if (!$tests->setup()) {
+            echo "Failed to setup integration\n";
+            return false;
+        } else {
+            $filterTests = $this->_runner->getArg('filter-tests', '');
+            if (empty($filterTests)) {
+                return true;
+            } else {
+                return $tests->runSetupTests($filterTests);
+            }
+        }
+    }
+
     public function run($params = array())
     {
         $testsPath = $this->_runner->getConfig('integrationTestsPath', '');
@@ -21,28 +64,7 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
                     $mainfn = $fn.'/main.php';
                     if (file_exists($mainfn)) {
                         require_once($mainfn);
-                        /** @var KmsCi_Runner_IntegrationTest_Base $tests */
-                        $tests = new $clsname($this->_runner, $integid);
-                        // skip integrations
-                        if ($tests->isSkipRun()) {
-                            continue;
-                        }
-                        // skip non-remote integration tests
-                        if ($isRemote && !$tests->isRemote()) {
-                            continue;
-                        }
-                        // skip remote integration tests
-                        if (!$isRemote && $tests->isRemote()) {
-                            continue;
-                        }
-                        $filter = $this->_runner->getArg('filter', '');
-                        if (empty($filter) || preg_match($filter, $integid) === 1) {
-                            echo "{$clsname}: \n";
-                            if (!$tests->run()) {
-                                $ret = false;
-                            }
-                        }
-                        echo "\n\n";
+                        $this->_run($integid, $clsname, $isRemote);
                     }
                 }
             }
@@ -59,19 +81,7 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
             return false;
         } else {
             require_once($mainfn);
-            /** @var KmsCi_Runner_IntegrationTest_Base $tests */
-            $tests = new $clsname($this->_runner, $integId);
-            if (!$tests->setup()) {
-                echo "Failed to setup integration\n";
-                return false;
-            } else {
-                $filterTests = $this->_runner->getArg('filter-tests', '');
-                if (empty($filterTests)) {
-                    return true;
-                } else {
-                    return $tests->runSetupTests($filterTests);
-                }
-            }
+            return $this->_setup($integId, $clsname);
         }
     }
 
