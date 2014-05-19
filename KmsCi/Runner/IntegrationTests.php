@@ -4,19 +4,20 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
 
     protected function _run($integid, $clsname, $isRemote = false)
     {
+        $ret = true;
         /** @var KmsCi_Runner_IntegrationTest_Base $tests */
         $tests = new $clsname($this->_runner, $integid);
         // skip integrations
         if ($tests->isSkipRun()) {
-            return;
+            return true;
         }
         // skip non-remote integration tests
         if ($isRemote && !$tests->isRemote()) {
-            return;
+            return true;
         }
         // skip remote integration tests
         if (!$isRemote && $tests->isRemote()) {
-            return;
+            return true;
         }
         $filter = $this->_runner->getArg('filter', '');
         if (empty($filter) || preg_match($filter, $integid) === 1) {
@@ -26,6 +27,7 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
             }
         }
         echo "\n\n";
+        return $ret;
     }
 
     protected function _setup($integId, $clsname)
@@ -64,7 +66,7 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
                     $mainfn = $fn.'/main.php';
                     if (file_exists($mainfn)) {
                         require_once($mainfn);
-                        $this->_run($integid, $clsname, $isRemote);
+                        $ret = $this->_run($integid, $clsname, $isRemote) ? $ret : false;
                     }
                 }
             }
