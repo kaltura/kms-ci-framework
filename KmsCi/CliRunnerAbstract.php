@@ -63,6 +63,8 @@ abstract class KmsCi_CliRunnerAbstract {
                     "  -r, --restore                restore the environment (after setup or setup-integration)",
                 'override' =>
                     " -oKEY=VAL, --override KEY=VAL override a configuration value (can be set multiple times)",
+                'run-script' =>
+                    " --run-script FILENAME         run a php script file in the context of the kmsci framework"
             ),
             'test-filtering' => array('Test filtering',
                 'filter' =>
@@ -225,6 +227,7 @@ abstract class KmsCi_CliRunnerAbstract {
             || $this->isArg('tests') || $this->isArg('integrations') || $this->isArg('remote')
             || $this->isArg('qunit') || $this->isArg('build')
             || $this->getArg('setup-integration')
+            || $this->isArg('run-script')
         );
     }
 
@@ -300,26 +303,34 @@ abstract class KmsCi_CliRunnerAbstract {
     protected function _run()
     {
         $ret = true;
-        // run the tests / integrations
-        $ret = (!$this->isArg('tests') || $this->_runTests()) ? $ret : false;
-        $ret = (!$this->isArg('qunit') || $this->_runQunitTests()) ? $ret : false;
-        $ret = (!$this->isArg('integrations') || $this->_runIntegrations()) ? $ret : false;
-        $ret = (!$this->isArg('remote') || $this->_runIntegrationsRemote()) ? $ret : false;
-        // do other funcs
-        if ($this->isArg('setup')) {
-            echo "\nSetting up the environment\n\n";
-        }
-        $ret = (!$this->isArg('setup') || $this->_runSetup()) ? $ret : false;
-        $ret = (!$this->getArg('setup-integration') || $this->_setupIntegration()) ? $ret : false;
-        if ($this->isArg('restore')) {
-            echo "\nRestoring the environment\n\n";
-        }
-        $ret = ($this->isArg('setup') || $this->getArg('setup-integration') || $this->_runRestore()) ? $ret : false;
+        if ($this->isArg('run-script')) {
+            $script = $this->getArg('run-script');
+            $runner = $this;
+            $return_value = true;
+            require($script);
+            $ret = $return_value;
+        } else {
+            // run the tests / integrations
+            $ret = (!$this->isArg('tests') || $this->_runTests()) ? $ret : false;
+            $ret = (!$this->isArg('qunit') || $this->_runQunitTests()) ? $ret : false;
+            $ret = (!$this->isArg('integrations') || $this->_runIntegrations()) ? $ret : false;
+            $ret = (!$this->isArg('remote') || $this->_runIntegrationsRemote()) ? $ret : false;
+            // do other funcs
+            if ($this->isArg('setup')) {
+                echo "\nSetting up the environment\n\n";
+            }
+            $ret = (!$this->isArg('setup') || $this->_runSetup()) ? $ret : false;
+            $ret = (!$this->getArg('setup-integration') || $this->_setupIntegration()) ? $ret : false;
+            if ($this->isArg('restore')) {
+                echo "\nRestoring the environment\n\n";
+            }
+            $ret = ($this->isArg('setup') || $this->getArg('setup-integration') || $this->_runRestore()) ? $ret : false;
 
-        if ($this->isArg('build')) {
-            echo "\nBuilding for ant\n\n";
+            if ($this->isArg('build')) {
+                echo "\nBuilding for ant\n\n";
+            }
+            $ret = (!$this->isArg('build') || $this->_runBuild()) ? $ret : false;
         }
-        $ret = (!$this->isArg('build') || $this->_runBuild()) ? $ret : false;
         return $ret;
     }
 
