@@ -47,6 +47,25 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
         }
     }
 
+    protected function _runAll($params)
+    {
+        $isRemote = (isset($params['isRemote']) && $params['isRemote']);
+        $ret = true;
+        foreach (glob($this->_runner->getConfig('integrationTestsPath').'/*') as $fn) {
+            if (is_dir($fn)) {
+                $tmp = explode('/', $fn);
+                $integid = $tmp[count($tmp)-1];
+                $clsname = 'IntegrationTests_'.$integid;
+                $mainfn = $fn.'/main.php';
+                if (file_exists($mainfn)) {
+                    require_once($mainfn);
+                    $ret = $this->_run($integid, $clsname, $isRemote) ? $ret : false;
+                }
+            }
+        }
+        return $ret;
+    }
+
     public function run($params = array())
     {
         $testsPath = $this->_runner->getConfig('integrationTestsPath', '');
@@ -56,21 +75,7 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
         } elseif (isset($params['isSetupIntegration']) && $params['isSetupIntegration']) {
             return $this->setupIntegration($this->_runner->getArg('setup-integration'));
         } else {
-            $isRemote = (isset($params['isRemote']) && $params['isRemote']);
-            $ret = true;
-            foreach (glob($this->_runner->getConfig('integrationTestsPath').'/*') as $fn) {
-                if (is_dir($fn)) {
-                    $tmp = explode('/', $fn);
-                    $integid = $tmp[count($tmp)-1];
-                    $clsname = 'IntegrationTests_'.$integid;
-                    $mainfn = $fn.'/main.php';
-                    if (file_exists($mainfn)) {
-                        require_once($mainfn);
-                        $ret = $this->_run($integid, $clsname, $isRemote) ? $ret : false;
-                    }
-                }
-            }
-            return $ret;
+            return $this->_runAll($params);
         }
     }
 
