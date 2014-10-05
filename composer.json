@@ -1,7 +1,18 @@
 {
     "name": "kaltura/kms-ci-framework",
+    "description": "Kaltura Kms-Ci-Framework continuous integration framework",
     "homepage": "http://kaltura.github.io/kms-ci-framework/",
-    "require": {
-        "facebook/webdriver": "dev-master"
-    }
+    "license": "AGPL-3.0",
+    "authors": [
+        {
+            "name": "Ori Hoch",
+            "email": "ori@uumpa.com",
+            "homepage": "http://orihoch.uumpa.com/",
+            "role": "developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/kaltura/kms-ci-framework/issues"
+    },
+    "bin": ["bin/kmsci"]
 }
