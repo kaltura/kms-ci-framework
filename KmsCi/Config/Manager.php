@@ -23,11 +23,7 @@ class KmsCi_Config_Manager {
                 $lastpart = $fullpart;
             }
         }
-        if (getenv('KMS_CI_CONFIG')) {
-            $merged_configs = json_decode(getenv('KMS_CI_CONFIG'), true);
-        } else {
-            $merged_configs = array();
-        }
+        $merged_configs = array();
         foreach ($fullparts as $part) {
             if (file_exists($part.DIRECTORY_SEPARATOR.'kmsci.conf.php')) {
                 $config = array();
@@ -41,6 +37,9 @@ class KmsCi_Config_Manager {
                 require($part.DIRECTORY_SEPARATOR.'kmsci.conf.local.php');
                 $merged_configs = array_merge($merged_configs, $config);
             }
+        }
+        if (getenv('KMS_CI_CONFIG')) {
+            $merged_configs = array_merge($merged_configs, json_decode(getenv('KMS_CI_CONFIG'), true));
         }
         return $merged_configs;
     }
