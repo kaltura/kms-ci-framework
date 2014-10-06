@@ -1,4 +1,6 @@
 language: php
+addons:
+  sauce_connect: true
 php:
   - 5.3
 before_script:
