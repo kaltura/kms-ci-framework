@@ -17,14 +17,12 @@ class KmsCi_Environment_PhpHelper extends KmsCi_Environment_BaseHelper {
 
     public function getPhpUnit()
     {
-        $toolsDir = $this->_runner->getConfig('toolsDir', '');
-        return (!empty($toolsDir) ? $toolsDir.'/' : '').'phpunit';
+        return $this->getBin('phpunit');
     }
 
     public function getPhp()
     {
-        $toolsDir = $this->_runner->getConfig('toolsDir', '');
-        return (!empty($toolsDir) ? $toolsDir.'/' : '').'php';
+        return $this->getBin('php');
     }
 
 }

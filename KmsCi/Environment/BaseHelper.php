@@ -25,4 +25,19 @@ class KmsCi_Environment_BaseHelper {
         return true;
     }
 
+    public function getBin($execName)
+    {
+        $vendorDir = $this->_runner->getConfig('vendorDir', '');
+        if (!empty($vendorDir) && file_exists($vendorDir.'/bin/'.$execName)) {
+            return $vendorDir.'/bin/'.$execName;
+        } else {
+            $toolsDir = $this->_runner->getConfig('toolsDir', '');
+            if (!empty($toolsDir) && file_exists($toolsDir.'/'.$execName)) {
+                return $toolsDir.'/'.$execName;
+            } else {
+                return $execName;
+            }
+        };
+    }
+
 }

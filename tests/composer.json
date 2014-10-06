@@ -1,0 +1,15 @@
+{
+    "name": "kaltura/kms-ci-framework-tests",
+    "description": "This is a project for the kmsci-framework tests, it is not the main project's composer!",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/kaltura/kms-ci-framework"
+        }
+    ],
+    "require": {
+        "kaltura/kms-ci-framework": "dev-master",
+        "facebook/webdriver": "dev-master",
+        "phpunit/phpunit": "4.3.*"
+    }
+}

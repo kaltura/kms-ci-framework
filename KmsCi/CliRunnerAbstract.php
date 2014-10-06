@@ -36,6 +36,8 @@ abstract class KmsCi_CliRunnerAbstract {
             'b' => 'build',
             'q' => 'qunit',
             'o' => 'override',
+            'v' => 'verbose',
+            'd' => 'debug',
         );
     }
 
@@ -64,7 +66,11 @@ abstract class KmsCi_CliRunnerAbstract {
                 'override' =>
                     " -oKEY=VAL, --override KEY=VAL override a configuration value (can be set multiple times)",
                 'run-script' =>
-                    " --run-script FILENAME         run a php script file in the context of the kmsci framework"
+                    " --run-script FILENAME         run a php script file in the context of the kmsci framework",
+                'verbose' =>
+                    " -v, --verbose                 verbose output",
+                'debug' =>
+                    " -d, --debug                   debug output",
             ),
             'test-filtering' => array('Test filtering',
                 'filter' =>
@@ -202,6 +208,24 @@ abstract class KmsCi_CliRunnerAbstract {
         return $this->_environment->log($msg);
     }
 
+    public function verbose($msg)
+    {
+        return $this->isArg('verbose') ? $this->log($msg) : true;
+    }
+
+    public function debug($msg)
+    {
+        return $this->isArg('debug') ? $this->log($msg) : true;
+    }
+
+    public function exportEnvironment()
+    {
+        return array(
+            'args' => $this->_args,
+            'config' => $this->_config
+        );
+    }
+
     /**
      * @return KmsCi_Environment_UtilHelper
      */
@@ -221,6 +245,9 @@ abstract class KmsCi_CliRunnerAbstract {
     {
         if ($this->isArg('all')) {
             $this->_setAll();
+        }
+        if ($this->isArg('debug')) {
+            $this->_args['verbose'] = true;
         }
         return (
             $this->isArg('setup') || $this->isArg('restore') || $this->isArg('clear')

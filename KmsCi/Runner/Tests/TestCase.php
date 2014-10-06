@@ -115,9 +115,12 @@ class KmsCi_Runner_Tests_TestCase {
 
     protected function _exec()
     {
+
         $cmd = $this->_getCmd();
-        $out = '';
-        exec($cmd, $out, $returnvar);
+        $utilHelper = $this->_runner->getUtilHelper();
+        $utilHelper->exec($cmd);
+        $out = $utilHelper->getExecOutput();
+        $returnvar = $utilHelper->getExecReturnvar();
         if ($returnvar !== 0 && $returnvar !== 1 && $returnvar !== 2) {
             return array(false, $returnvar, $cmd, $out);
         } else {

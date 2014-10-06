@@ -3,6 +3,10 @@
 
 class KmsCi_Environment_UtilHelper extends KmsCi_Environment_BaseHelper {
 
+    protected $_lastExecOutput;
+    protected $_lastExecReturnvar;
+
+
     /**
      * @param string $filename
      * @return bool if file exists - ensure to unlink, if it doesn't exist return true
@@ -67,6 +71,27 @@ class KmsCi_Environment_UtilHelper extends KmsCi_Environment_BaseHelper {
     public function normalizePath($path)
     {
         return str_replace('\\', '/', $path);
+    }
+
+    public function getExecReturnvar()
+    {
+        return $this->_lastExecReturnvar;
+    }
+
+    public function getExecOutput()
+    {
+        return $this->_lastExecOutput;
+    }
+
+    public function exec($cmd)
+    {
+        $this->_runner->verbose('>> '.$cmd);
+        $this->_lastExecOutput = '';
+        $this->_lastExecReturnvar = '';
+        exec($cmd, $this->_lastExecOutput, $this->_lastExecReturnvar);
+        $this->_runner->debug('== '.$this->_lastExecReturnvar);
+        $this->_runner->debug(implode("\n", $this->_lastExecOutput));
+        return ($this->_lastExecReturnvar === 0);
     }
 
 }

@@ -1,0 +1,4 @@
+/vendor/
+/composer.lock
+/kmsci.conf.local.php
+/.build

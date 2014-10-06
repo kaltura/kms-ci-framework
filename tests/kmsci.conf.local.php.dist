@@ -8,4 +8,6 @@
 $config = array(
     // url (without http://) for the qunit tests (see installation/configuration guide)
     'qunitUrl' => 'kmsciframework.local',
+    // sauceLabs username:accesskey
+    // 'sauceLabsLogin' => 'username:accesskey',
 );
