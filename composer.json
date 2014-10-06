@@ -14,5 +14,8 @@
     "support": {
         "issues": "https://github.com/kaltura/kms-ci-framework/issues"
     },
+    "autoload": {
+        "classmap": ["KmsCi/"]
+    },
     "bin": ["bin/kmsci"]
 }
