@@ -10,8 +10,7 @@ class KmsCi_Environment_PhantomHelper extends KmsCi_Environment_BaseHelper
 
     public function get()
     {
-        $toolsDir = $this->_runner->getConfig('toolsDir', '');
-        return (!empty($toolsDir) ? $toolsDir.'/' : '').'phantomjs';
+        return $this->getBin('phantomjs');
     }
 
     public function getScreenshot($url, $width, $height, $pngfile, $htmlfile, $screenshotjs = '', $extraargs = '')
@@ -25,11 +24,12 @@ class KmsCi_Environment_PhantomHelper extends KmsCi_Environment_BaseHelper
             $extraargs = ' '.implode(' ', $tmp);
         }
         $phantomjs = $this->get();
-        passthru($phantomjs.' '.$screenshotjs.' '
+        $cmd = $phantomjs.' '.$screenshotjs.' '
             .escapeshellarg($url).' '.escapeshellarg($width).' '
             .escapeshellarg($height).' '.escapeshellarg($pngfile).' '
-            .escapeshellarg($htmlfile).$extraargs, $returnvar
-        );
+            .escapeshellarg($htmlfile).$extraargs;
+        //var_dump($cmd);die;
+        passthru($cmd, $returnvar);
         return ($returnvar === 0);
     }
 

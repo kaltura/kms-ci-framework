@@ -5,8 +5,7 @@ class KmsCi_Environment_CasperHelper extends KmsCi_Environment_BaseHelper {
 
     public function get()
     {
-        $toolsDir = $this->_runner->getConfig('toolsDir', '');
-        return (!empty($toolsDir) ? $toolsDir.'/' : '').'casperjs';
+        return $this->getBin('casperjs');
     }
 
     public function test($jsFilename, $logDumpFilename, $params)
@@ -20,7 +19,11 @@ class KmsCi_Environment_CasperHelper extends KmsCi_Environment_BaseHelper {
         exec($cmd, $output, $returnvar);
         if ($returnvar === 0) {
             $output = implode("\n", $output);
-            file_put_contents($logDumpFilename, $output);
+            if (!empty($logDumpFilename)) {
+                file_put_contents($logDumpFilename, $output);
+            } else {
+                echo $output;
+            }
             return true;
         } else {
             echo $cmd."\n";
