@@ -66,6 +66,11 @@ class KmsCi_PHPUnit_TestCase_PhpWebdriverBrowsers extends PHPUnit_Framework_Test
         }
         if (array_key_exists('sauce', $browser)) {
             $host = 'http://'.$browser['sauce'].'@ondemand.saucelabs.com:80/wd/hub';
+            if (getenv('TRAVIS_JOB_NUMBER')) {
+                // silly hack to set the tunnel id for travis
+                // TODO: make this more generic, not dependant on travis
+                $capabilities->setCapability('tunnel-identifier', getenv('TRAVIS_JOB_NUMBER'));
+            }
         } elseif (array_key_exists('host', $browser)) {
             $host = $browser['host'];
         } elseif ($browserName == 'chrome') {
