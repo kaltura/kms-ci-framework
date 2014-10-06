@@ -6,6 +6,6 @@ before_script:
   - sleep 5
 script:
   - cd tests
-  - sed -i 's/\"kaltura\/kms-ci-framework": "dev-master"/"kaltura\/kms-ci-framework": "dev-master#%{commit}"/' composer.json
+  - sh set_composer_commit.sh %{commit}
   - composer install
   - vendor/bin/kmsci -a
