@@ -1,0 +1,11 @@
+language: php
+php:
+  - 5.3
+before_script:
+  - python -m SimpleHTTPServer &
+  - sleep 5
+script:
+  - cd tests
+  - sed -i 's/\"kaltura\/kms-ci-framework": "dev-master"/"kaltura\/kms-ci-framework": "dev-master#%{commit}"/' composer.json
+  - composer install
+  - vendor/bin/kmsci -a

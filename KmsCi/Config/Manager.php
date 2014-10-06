@@ -23,7 +23,11 @@ class KmsCi_Config_Manager {
                 $lastpart = $fullpart;
             }
         }
-        $merged_configs = array();
+        if (getenv('KMS_CI_CONFIG')) {
+            $merged_configs = json_decode(getenv('KMS_CI_CONFIG'), true);
+        } else {
+            $merged_configs = array();
+        }
         foreach ($fullparts as $part) {
             if (file_exists($part.DIRECTORY_SEPARATOR.'kmsci.conf.php')) {
                 $config = array();
