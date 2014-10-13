@@ -7,7 +7,6 @@ before_script:
   - python -m SimpleHTTPServer &
   - sleep 5
 script:
-  - cd tests
-  - sh set_composer_commit.sh %{commit}
   - composer install
-  - vendor/bin/kmsci -a
+  - cd tests
+  - ../bin/kmsci -a

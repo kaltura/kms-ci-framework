@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__.'/../../vendor/autoload.php');
+require_once(__DIR__.'/../../../vendor/autoload.php');
 
 class KmsCiFramework_TestMe extends KmsCi_PHPUnit_TestCase_PhpWebdriverBrowsers {
 

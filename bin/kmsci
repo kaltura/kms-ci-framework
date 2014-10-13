@@ -1,9 +1,37 @@
-#!/bin/bash
-SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-  SOURCE="$(readlink "$SOURCE")"
-  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-done
-DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-php $DIR/run.php "$@"
+#!/usr/bin/env php
+<?php
+
+// in real deployment
+// assumes I'm in: vendor/kaltura/kms-ci-framework/bin/kmsci
+// and I need:     vendor/autoload.php
+if (file_exists(__DIR__.'/../../../../autoload.php')) require_once(__DIR__.'/../../../../autoload.php');
+// for development
+// assumes I'm in: kms-ci-framework/bin/kmsci
+// and I need:     kms-ci-framework/vendor/autoload.php
+else require_once(__DIR__.'/../vendor/autoload.php');
+
+$configManager = new KmsCi_Config_Manager(getcwd());
+$config = $configManager->getConfig();
+
+function errorhelp($msg)
+{
+    echo "\n*** ERROR **\n\n{$msg}\n\nPlease see the usage guide at https://github.com/kaltura/kms-ci-framework/blob/master/README.md\n\n";
+    exit(1);
+}
+
+if (!array_key_exists('CliRunnerFile', $config)) {
+    errorhelp('CliRunnerFile configuration key does not exist');
+} elseif (!file_exists($config['CliRunnerFile'])) {
+    errorhelp('The file defined in CliRunnerFile does not exist ("'.$config['CliRunnerFile'].'")');
+} elseif (!array_key_exists('CliRunnerClass', $config)) {
+    errorhelp('CliRunnerClass configuration key does not exist');
+} else {
+    require($config['CliRunnerFile']);
+    $className = $config['CliRunnerClass'];
+    if (!class_exists($className)) {
+        errorhelp('The class defined in CliRunnerClass does not exist ("'.$className.'")');
+    } else {
+        $runner = new $className($config, $argv);
+        $runner->run();
+    }
+}

@@ -17,5 +17,9 @@
     "autoload": {
         "classmap": ["KmsCi/"]
     },
-    "bin": ["bin/kmsci"]
+    "bin": ["bin/kmsci"],
+    "require": {
+        "facebook/webdriver": "dev-master",
+        "phpunit/phpunit": "4.3.*"
+    }
 }

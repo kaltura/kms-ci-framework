@@ -11,7 +11,7 @@ $config = array(
      */
 
     // you should use composer to create this directory
-    'vendorDir' => __DIR__.'/vendor',
+    'vendorDir' => __DIR__.'/../vendor',
 
     // File containing the main CliRunner for your project
     'CliRunnerFile' => __DIR__.'/CliRunner.php',
