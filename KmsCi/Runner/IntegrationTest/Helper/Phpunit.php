@@ -56,8 +56,9 @@ class KmsCi_Runner_IntegrationTest_Helper_Phpunit extends KmsCi_Runner_Integrati
                     array('name' => 'chrome','sauce' => $sauce,'version' => 'beta', 'platform' => 'Windows 8',),
                 );
             }
+            $browsers = json_encode($browsers);
         }
-        $args = array_merge($args, array('browsers'=>json_encode($browsers)));
+        $args = array_merge($args, array('browsers'=>$browsers));
         return $this->test($filename, $classname, $switches, $args);
     }
 
