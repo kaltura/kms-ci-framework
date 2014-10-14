@@ -37,7 +37,9 @@ class QunitTestCase extends KmsCi_Runner_Tests_TestCase {
 
     protected function _getCmd()
     {
-        $filename = str_replace(realpath($this->_runner->getConfig('qunitWebServerBasePath')), '', realpath($this->_filename));
+        $qunitWebServerBasePath = $this->_runner->getUtilHelper()->normalizePath(realpath($this->_runner->getConfig('qunitWebServerBasePath')));
+        $filename = $this->_runner->getUtilHelper()->normalizePath(realpath($this->_filename));
+        $filename = str_replace($qunitWebServerBasePath, '', $filename);
         return $this->_runner->getEnvironment()->getHelper('phantom')->get().' '.$this->_runner->getKmsCiRootPath().'/js/qunit_runner.js http://'.$this->_runner->getConfig('qunitUrl').$filename;
     }
 
