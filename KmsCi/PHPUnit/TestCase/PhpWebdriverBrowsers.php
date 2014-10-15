@@ -88,6 +88,7 @@ class KmsCi_PHPUnit_TestCase_PhpWebdriverBrowsers extends PHPUnit_Framework_Test
 
     public static function suite($className)
     {
+        /** @var KmsCi_PHPUnit_TestCase_PhpWebdriverBrowsers $className */
         $suite = new PHPUnit_Framework_TestSuite();
         foreach ($className::$browsers as $browser) {
             $bsuite = new PHPUnit_Framework_TestSuite();

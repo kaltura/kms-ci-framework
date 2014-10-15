@@ -56,9 +56,17 @@ class KmsCi_Runner_IntegrationTest_Helper_Phpunit extends KmsCi_Runner_Integrati
                     array('name' => 'chrome','sauce' => $sauce,'version' => 'beta', 'platform' => 'Windows 8',),
                 );
             }
+            $browsers = json_encode($browsers);
         }
-        $args = array_merge($args, array('browsers'=>json_encode($browsers)));
-        return $this->test($filename, $classname, $switches, $args);
+        $args = array_merge($args, array('browsers'=>$browsers));
+        $browsers = json_decode($browsers);
+        if (empty($browsers)) {
+            echo "no browsers defined for testing\n";
+            echo "SKIPPED\n";
+            return true;
+        } else {
+            return $this->test($filename, $classname, $switches, $args);
+        }
     }
 
     public static function getTestBrowsers()
