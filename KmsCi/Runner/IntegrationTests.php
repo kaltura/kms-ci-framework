@@ -49,8 +49,28 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
 
     protected function _runAll($params)
     {
-        $isRemote = (isset($params['isRemote']) && $params['isRemote']);
         $ret = true;
+        $isRemote = (isset($params['isRemote']) && $params['isRemote']);
+        $rootPath = $this->_runner->getConfig('rootPath', '');
+        if (!empty($rootPath)) {
+            // if there is a rootPath config - scan all subdirectories of this path for integration tests
+            // it looks for a file under tests/integration/main.php - for each directory
+            $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($rootPath), RecursiveIteratorIterator::SELF_FIRST);
+            foreach($files as $file) {
+                /** @var DirectoryIterator $file */
+                $filename = $file->getPathname();
+                if (strpos($filename, '/tests/integration/main.php') !== false) {
+                    $str = file_get_contents($filename);
+                    if (preg_match("/\s+([a-zA-Z]+)_Integration\s/i", $str, $matches)) {
+                        $integid = strtolower($matches[1]);
+                        $clsname = ucfirst($integid).'_Integration';
+                        require_once($filename);
+                        $ret = $this->_run($integid, $clsname, $isRemote) ? $ret : false;
+                    };
+                }
+            }
+        }
+        // look in the integrationTestsPath
         foreach (glob($this->_runner->getConfig('integrationTestsPath').'/*') as $fn) {
             if (is_dir($fn)) {
                 $tmp = explode('/', $fn);
@@ -81,14 +101,41 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
 
     public function setupIntegration($integId)
     {
-        $clsname = 'IntegrationTests_'.$integId;
-        $mainfn = $this->_runner->getConfig('integrationTestsPath').'/'.$integId.'/main.php';
-        if (!file_exists($mainfn)) {
-            echo "file not found: {$mainfn}\n";
-            return false;
+        $foundIt = false;
+        $ret = false;
+        $rootPath = $this->_runner->getConfig('rootPath', '');
+        if (!empty($rootPath)) {
+            // look for integration in directories under the rootPath
+            $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($rootPath), RecursiveIteratorIterator::SELF_FIRST);
+            foreach($files as $file) {
+                /** @var DirectoryIterator $file */
+                $filename = $file->getPathname();
+                if (strpos($filename, '/tests/integration/main.php') !== false) {
+                    $str = file_get_contents($filename);
+                    if (preg_match("/\s+([a-zA-Z]+)_Integration\s/i", $str, $matches)) {
+                        $tmpIntegid = strtolower($matches[1]);
+                        if ($integId == $tmpIntegid) {
+                            $clsname = ucfirst($tmpIntegid).'_Integration';
+                            require_once($filename);
+                            $ret = $this->_setup($tmpIntegid, $clsname);
+                            $foundIt = true;
+                        }
+                    }
+                }
+            }
+        }
+        if ($foundIt) {
+            return $ret;
         } else {
-            require_once($mainfn);
-            return $this->_setup($integId, $clsname);
+            $clsname = 'IntegrationTests_'.$integId;
+            $mainfn = $this->_runner->getConfig('integrationTestsPath').'/'.$integId.'/main.php';
+            if (!file_exists($mainfn)) {
+                echo "file not found: {$mainfn}\n";
+                return false;
+            } else {
+                require_once($mainfn);
+                return $this->_setup($integId, $clsname);
+            }
         }
     }
 
