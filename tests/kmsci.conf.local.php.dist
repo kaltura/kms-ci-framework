@@ -10,4 +10,33 @@ $config = array(
     'qunitUrl' => 'kmsciframework.local',
     // sauceLabs username:accesskey
     // 'sauceLabsLogin' => 'username:accesskey',
+
+    /**
+        kaltura migrations configuration
+        the recommended way to configure kaltura migrations is using a dedicated kaltura server for testing
+        this way you can automatically create a partner for each integration
+        alternatively - you can define a pre-created partner for each integration
+        see below some example configurations
+    **/
+    /**
+        // using the vagrant virtual machine (as defined in vendor/kaltura/kmig/Vagrantfile
+        // no configuration needed - default values should just work
+    **/
+    /**
+        // using a different kaltura server dedicated installation for testing
+        // change values according to your installation
+        'kmig.serviceUrl' => 'http://kaltura.local',
+        'kmig.adminConsoleUser' => 'admin@kaltura.local',
+        'kmig.adminConsolePassword' => 'Kaltura1!',
+        'kmig.defaultServerDomain' => 'kaltura.local',
+        'kmig.defaultPassword' => 'Kaltura1!',
+    **/
+    /**
+        // using a partner on the production kaltura server
+        'kmig.serviceUrl' => 'http://www.kaltura.com',
+        // you can define a different partner for each integration
+        // in this example "migrations" is the name of the integration
+        'kmig.migrations.partnerId' => '9999999',
+        'kmig.migrations.adminSecret' => 'aabbccddeeffgghhii',
+    **/
 );

@@ -8,9 +8,16 @@ require(__DIR__.'/Environment.php');
 
 class KmsCiFramework_CliRunner extends KmsCi_CliRunnerAbstract {
 
+    protected function _validateArgs()
+    {
+        $helper = new KmsCi_Kmig_Helper($this);
+        return $helper->CliRunner_validateArgs(parent::_validateArgs());
+    }
+
     protected function _run()
     {
-        $ret = parent::_run();
+        $helper = new KmsCi_Kmig_Helper($this);
+        $ret = $helper->CliRunner_run(parent::_run());
         // make sure the relevant testproj helpers ran
         if (isset($GLOBALS['RAN_test']) && $GLOBALS['RAN_test']) {
             $logfile = $this->getConfig('buildPath').'/output/testproj/logs/testUnitTestsBootstrap.log';

@@ -101,9 +101,23 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
 
     public function setupIntegration($integId)
     {
+        if ($className = self::getIntegrationClassById($integId, $this)) {
+            return $this->_setup($integId, $className);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param $integId
+     * @param $runner KmsCi_CliRunnerAbstract
+     * @return string the integration class name
+     */
+    public static function getIntegrationClassById($integId, $runner)
+    {
         $foundIt = false;
-        $ret = false;
-        $rootPath = $this->_runner->getConfig('rootPath', '');
+        $retClassName = '';
+        $rootPath = $runner->getConfig('rootPath', '');
         if (!empty($rootPath)) {
             // look for integration in directories under the rootPath
             $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($rootPath), RecursiveIteratorIterator::SELF_FIRST);
@@ -117,26 +131,24 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
                         if ($integId == $tmpIntegid) {
                             $clsname = ucfirst($tmpIntegid).'_Integration';
                             require_once($filename);
-                            $ret = $this->_setup($tmpIntegid, $clsname);
+                            $retClassName = $clsname;
                             $foundIt = true;
                         }
                     }
                 }
             }
         }
-        if ($foundIt) {
-            return $ret;
-        } else {
+        if (!$foundIt) {
             $clsname = 'IntegrationTests_'.$integId;
-            $mainfn = $this->_runner->getConfig('integrationTestsPath').'/'.$integId.'/main.php';
+            $mainfn = $runner->getConfig('integrationTestsPath').'/'.$integId.'/main.php';
             if (!file_exists($mainfn)) {
                 echo "file not found: {$mainfn}\n";
-                return false;
             } else {
                 require_once($mainfn);
-                return $this->_setup($integId, $clsname);
+                $retClassName = $clsname;
             }
         }
+        return $retClassName;
     }
 
 }

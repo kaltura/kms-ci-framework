@@ -10,7 +10,8 @@ class IntegrationTests_migrations extends KmsCi_Runner_IntegrationTest_Base {
     public function setup()
     {
         if (parent::setup()) {
-            return KmsCi_Kmig_Helper::setupIntegration($this->_runner, $this->_integid, $this->getIntegrationPath());
+            $helper = new KmsCi_Kmig_Helper($this->_runner);
+            return $helper->setupIntegration($this->_integid, $this->getIntegrationPath());
         } else {
             return false;
         }

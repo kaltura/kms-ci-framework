@@ -13,7 +13,7 @@ class KmsCi_Environment_PhpmigHelper extends KmsCi_Environment_BaseHelper {
             $cmd.=$k.'='.escapeshellarg($v).' ';
         }
         $cmd .= $this->_runner->getUtilHelper()->getBin('phpmig');
-        $cmd .= ' --bootstrap='.escapeshellarg($bootstrapFile);
+        if (!empty($bootstrapFile)) $cmd .= ' --bootstrap='.escapeshellarg($bootstrapFile);
         foreach ($params as $k=>$v) {
             if (is_numeric($k)) {
                 $cmd .= ' '.escapeshellarg($v);
