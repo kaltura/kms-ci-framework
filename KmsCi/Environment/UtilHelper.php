@@ -5,6 +5,7 @@ class KmsCi_Environment_UtilHelper extends KmsCi_Environment_BaseHelper {
 
     protected $_lastExecOutput;
     protected $_lastExecReturnvar;
+    protected $_execPassthru = false;
 
 
     /**
@@ -83,12 +84,21 @@ class KmsCi_Environment_UtilHelper extends KmsCi_Environment_BaseHelper {
         return $this->_lastExecOutput;
     }
 
+    public function setExecPassthru($execPassthru = true)
+    {
+        $this->_execPassthru = $execPassthru;
+    }
+
     public function exec($cmd)
     {
         $this->_runner->verbose('>> '.$cmd);
-        $this->_lastExecOutput = '';
+        $this->_lastExecOutput = array();
         $this->_lastExecReturnvar = '';
-        exec($cmd, $this->_lastExecOutput, $this->_lastExecReturnvar);
+        if ($this->_execPassthru) {
+            passthru($cmd, $this->_lastExecReturnvar);
+        } else {
+            exec($cmd, $this->_lastExecOutput, $this->_lastExecReturnvar);
+        }
         $this->_runner->debug('== '.$this->_lastExecReturnvar);
         $this->_runner->debug(implode("\n", $this->_lastExecOutput));
         return ($this->_lastExecReturnvar === 0);

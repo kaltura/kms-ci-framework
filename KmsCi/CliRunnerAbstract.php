@@ -395,4 +395,9 @@ abstract class KmsCi_CliRunnerAbstract {
         }
     }
 
+    public function getArgs()
+    {
+        return $this->_args;
+    }
+
 }

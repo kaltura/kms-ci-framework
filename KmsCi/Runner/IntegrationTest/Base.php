@@ -31,6 +31,9 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
         return $this->_runner;
     }
 
+    /**
+     * @return string
+     */
     public function getIntegrationPath()
     {
         // usually you will just do "return __DIR__;" here
