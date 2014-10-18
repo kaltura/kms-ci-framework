@@ -16,18 +16,20 @@ class KmsCi_Kmig_Helper {
      * @param null $envParams
      * @return bool
      */
-    public function setupIntegration($integId, $integrationPath, $envParams = null)
+    public function setupIntegration($integId, $integrationPath, $envParams = null, $kmigMigratorId = null)
     {
+        if (empty($envParams)) $envParams = array();
+        if (empty($kmigMigratorId)) $kmigMigratorId = 'kmsci_integration_'.$integId;
+        $envParams = array_merge($envParams, $this->_getEnvParams($integId));
         /** @var KmsCi_Environment_PhpmigHelper $helper */
         $helper = $this->_runner->getEnvironment()->getHelper('phpmig');
-
         if (!$helper->exec($envParams, $integrationPath.'/phpmig.php', array('migrate'))) {
             return false;
         } else {
             $container = new \Kmig\Container();
             $datafilename = $integrationPath.'/.kmig.phpmig.data';
             \Kmig\Helper\Phpmig\KmigAdapter::setContainerValuesFromDataFile($container, $datafilename);
-            $container['Kmig_Migrator_ID'] = 'kmsci_integration_'.$integId;
+            $container['Kmig_Migrator_ID'] = $kmigMigratorId;
             return true;
         }
     }
@@ -207,6 +209,28 @@ class KmsCi_Kmig_Helper {
     protected function _getPhpmigFileContents_postCode()
     {
         return '';
+    }
+
+    protected function _getEnvParams($integId)
+    {
+        $envParams = array();
+        $keys = array(
+            'serviceUrl' => 'KALTURA_SERVICE_URL',
+            'adminConsoleUser' => 'KALTURA_ADMIN_CONSOLE_USER',
+            'adminConsolePassword' => 'KALTURA_ADMIN_CONSOLE_PASSWORD',
+            'defaultServerDomain' => 'KALTURA_DEFAULT_SERVER_DOMAIN',
+            'defaultPassword' => 'KALTURA_DEFAULT_PASSWORD',
+            'partnerId' => 'KALTURA_PARTNER_ID',
+            'adminSecret' => 'KALTURA_ADMIN_SECRET'
+        );
+        foreach ($keys as $configKey => $envParamKey) {
+            // try first from specific integration configuration, then from default
+            $v = $this->_runner->getConfig('kmig.'.$integId.'.'.$configKey, $this->_runner->getConfig('kmig.'.$configKey, ''));
+            if (!empty($v)) {
+                $envParams[$envParamKey] = $v;
+            }
+        }
+        return $envParams;
     }
 
 }
