@@ -45,6 +45,11 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
         return $this->getIntegrationPath().'/'.$filename;
     }
 
+    public function getIntegrationId()
+    {
+        return $this->_integid;
+    }
+
     protected function _copyLogs()
     {
         /** @var KmsCi_Environment_LogsHelper $logsHelper */

@@ -2,7 +2,7 @@
 
 class IntegrationTests_migrations extends KmsCi_Runner_IntegrationTest_Base {
 
-    /** @var  KmsCi_Kmig_Helper */
+    /** @var  KmsCi_Kmig_IntegrationHelper */
     protected $_kmigHelper;
 
     public function getIntegrationPath()
@@ -12,14 +12,9 @@ class IntegrationTests_migrations extends KmsCi_Runner_IntegrationTest_Base {
 
     public function setup()
     {
-        // only for testing - delete the .kmig.phpmig.data file to make sure it's created properly
-        $this->_runner->getUtilHelper()->softUnlink($this->getIntegrationPath().'/.kmig.phpmig.data');
-        // also - change the kmig identifier each time so we will create new data each time, for real integrations
-        // you can just set it to null - it will be set automatically with the integration name and some prefix
-        $kmigMigratorId = uniqid();
         if (parent::setup()) {
-            $this->_kmigHelper = new KmsCi_Kmig_Helper($this->_runner);
-            return $this->_kmigHelper->setupIntegration($this->_integid, $this->getIntegrationPath(), null, $kmigMigratorId);
+            $this->_kmigHelper = new KmsCi_Kmig_IntegrationHelper($this);
+            return $this->_kmigHelper->setup();
         } else {
             return false;
         }

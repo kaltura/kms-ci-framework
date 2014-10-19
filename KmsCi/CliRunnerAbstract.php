@@ -7,6 +7,9 @@ abstract class KmsCi_CliRunnerAbstract {
     protected $_config = array();
     protected $_args = array();
 
+    /** @var KmsCi_Runner_CommandBase[]  */
+    protected $_cmds = array();
+
     /** @var  KmsCi_Environment */
     protected $_environment;
 
@@ -15,6 +18,12 @@ abstract class KmsCi_CliRunnerAbstract {
         $this->_args = $this->_parseArgs($args);
         $this->_config = $this->_overrideConfig($config);
         $this->_environment = $this->_getNewEnvironment();
+        $this->_init();
+    }
+
+    protected function _init()
+    {
+        // use this to write initialization code in extending classes
     }
 
     /**
@@ -53,7 +62,7 @@ abstract class KmsCi_CliRunnerAbstract {
      */
     protected function _getHelpData()
     {
-        return array(
+        $helpData = array(
             'misc' => array('Miscellaneous Options',
                 'all' =>
                     "  -a, --all                    run all the integration and unit-tests",
@@ -98,6 +107,10 @@ abstract class KmsCi_CliRunnerAbstract {
                     "  --setup-integration INTEGID  setup environment for a specific integration (use -r to restore afterwards)"
             )
         );
+        foreach ($this->_cmds as $cmd) {
+            $helpData = array_merge($helpData, $cmd->getHelpData());
+        }
+        return $helpData;
     }
 
     protected function _parseArgSet($arr, $key, $val)
@@ -249,13 +262,21 @@ abstract class KmsCi_CliRunnerAbstract {
         if ($this->isArg('debug')) {
             $this->_args['verbose'] = true;
         }
-        return (
+        if (!(
             $this->isArg('setup') || $this->isArg('restore') || $this->isArg('clear')
             || $this->isArg('tests') || $this->isArg('integrations') || $this->isArg('remote')
             || $this->isArg('qunit') || $this->isArg('build')
             || $this->getArg('setup-integration')
             || $this->isArg('run-script')
-        );
+        )) {
+            return false;
+        } else {
+            $ret = true;
+            foreach ($this->_cmds as $cmd) {
+                $ret = $cmd->validateArgs() ? $ret : false;
+            }
+            return $ret;
+        }
     }
 
     protected function _getNewEnvironment()
@@ -358,6 +379,9 @@ abstract class KmsCi_CliRunnerAbstract {
             }
             $ret = (!$this->isArg('build') || $this->_runBuild()) ? $ret : false;
         }
+        foreach ($this->_cmds as $cmd) {
+            $ret = $cmd->run() ? $ret : false;
+        }
         return $ret;
     }
 
@@ -398,6 +422,14 @@ abstract class KmsCi_CliRunnerAbstract {
     public function getArgs()
     {
         return $this->_args;
+    }
+
+    /**
+     * @param $cmd KmsCi_Runner_CommandBase
+     */
+    public function addCommand($cmd)
+    {
+        $this->_cmds[] = $cmd;
     }
 
 }
