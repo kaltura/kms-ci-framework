@@ -9,6 +9,7 @@ $config = array(
     /*
      * Required configurations for all projects
      */
+    'rootPath' => __DIR__,
 
     // you should use composer to create this directory
     'vendorDir' => __DIR__.'/../vendor',

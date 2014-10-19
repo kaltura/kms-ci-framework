@@ -101,7 +101,7 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
 
     public function setupIntegration($integId)
     {
-        if ($className = self::getIntegrationClassById($integId, $this)) {
+        if ($className = self::getIntegrationClassById($integId, $this->_runner)) {
             return $this->_setup($integId, $className);
         } else {
             return false;

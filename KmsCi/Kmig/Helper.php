@@ -5,6 +5,9 @@ class KmsCi_Kmig_Helper {
     /** @var  KmsCi_CliRunnerAbstract */
     protected $_runner;
 
+    /** @var  \Kmig\Container */
+    protected $_container = null;
+
     public function __construct($runner)
     {
         $this->_runner = $runner;
@@ -16,22 +19,38 @@ class KmsCi_Kmig_Helper {
      * @param null $envParams
      * @return bool
      */
-    public function setupIntegration($integId, $integrationPath, $envParams = null, $kmigMigratorId = null)
+    public function setupIntegration($integId, $integrationPath, $envParams = null)
     {
         if (empty($envParams)) $envParams = array();
-        if (empty($kmigMigratorId)) $kmigMigratorId = 'kmsci_integration_'.$integId;
         $envParams = array_merge($envParams, $this->_getEnvParams($integId));
         /** @var KmsCi_Environment_PhpmigHelper $helper */
         $helper = $this->_runner->getEnvironment()->getHelper('phpmig');
         if (!$helper->exec($envParams, $integrationPath.'/phpmig.php', array('migrate'))) {
             return false;
         } else {
-            $container = new \Kmig\Container();
+            $container = array();
+            require_once($integrationPath.'/phpmig.php');
+            $this->_container = $container;
             $datafilename = $integrationPath.'/.kmig.phpmig.data';
-            \Kmig\Helper\Phpmig\KmigAdapter::setContainerValuesFromDataFile($container, $datafilename);
-            $container['Kmig_Migrator_ID'] = $kmigMigratorId;
+            \Kmig\Helper\Phpmig\KmigAdapter::setContainerValuesFromDataFile($this->_container, $datafilename);
             return true;
         }
+    }
+
+    /**
+     * @return \Kmig\Migrator
+     */
+    public function getMigrator()
+    {
+        return $this->_container['migrator'];
+    }
+
+    /**
+     * @return \Kaltura_Client_Client
+     */
+    public function getClient()
+    {
+        return $this->_container['client'];
     }
 
     /**
@@ -41,6 +60,17 @@ class KmsCi_Kmig_Helper {
     public function CliRunner_validateArgs($ret)
     {
         return ($ret || $this->_runner->isArg('kmig'));
+    }
+
+    public function CliRunner_getHelpData($helpData)
+    {
+        $helpData['kaltura-migrations'] = array('Kaltura Migrations',
+            'kmig' =>
+                "  --kmig INTEGID               run the phpmig command in the context of the given integration id\n"
+               ."                               prefix parameters to php mig with --kmig e.g.:\n"
+               ."                               kmsci --kmig INTEGID --kmig-init"
+        );
+        return $helpData;
     }
 
     /**
@@ -202,7 +232,7 @@ class KmsCi_Kmig_Helper {
     {
         return ''
             ."// change this path to your kaltura lib or to point to your relative vendor dir\n"
-            ."require_once(__DIR__.'/../../../../vendor/kaltura/kmig/lib/Kaltura/autoload.php');\n"
+            ."require_once(__DIR__.'/../../../vendor/kaltura/kmig/lib/Kaltura/autoload.php');\n"
         ;
     }
 

@@ -2,6 +2,9 @@
 
 class IntegrationTests_migrations extends KmsCi_Runner_IntegrationTest_Base {
 
+    /** @var  KmsCi_Kmig_Helper */
+    protected $_kmigHelper;
+
     public function getIntegrationPath()
     {
         return __DIR__;
@@ -15,8 +18,8 @@ class IntegrationTests_migrations extends KmsCi_Runner_IntegrationTest_Base {
         // you can just set it to null - it will be set automatically with the integration name and some prefix
         $kmigMigratorId = uniqid();
         if (parent::setup()) {
-            $helper = new KmsCi_Kmig_Helper($this->_runner);
-            return $helper->setupIntegration($this->_integid, $this->getIntegrationPath(), null, $kmigMigratorId);
+            $this->_kmigHelper = new KmsCi_Kmig_Helper($this->_runner);
+            return $this->_kmigHelper->setupIntegration($this->_integid, $this->getIntegrationPath(), null, $kmigMigratorId);
         } else {
             return false;
         }
@@ -24,8 +27,15 @@ class IntegrationTests_migrations extends KmsCi_Runner_IntegrationTest_Base {
 
     public function testDummy()
     {
-        echo "OK\n";
-        return true;
+        $mEntry = $this->_kmigHelper->getMigrator()->entry->get('test123');
+        $kEntry = $this->_kmigHelper->getClient()->baseEntry->get($mEntry->id);
+        if ($mEntry->name == 'test123' && $kEntry->name == 'test123') {
+            echo 'OK';
+            return true;
+        } else {
+            echo 'FAILED';
+            return false;
+        }
     }
 
 }
