@@ -262,21 +262,18 @@ abstract class KmsCi_CliRunnerAbstract {
         if ($this->isArg('debug')) {
             $this->_args['verbose'] = true;
         }
-        if (!(
-            $this->isArg('setup') || $this->isArg('restore') || $this->isArg('clear')
+        $hasCmd = false;
+        foreach ($this->_cmds as $cmd) {
+            $hasCmd = $cmd->validateArgs() ? true : $hasCmd;
+        }
+        return (
+            $hasCmd
+            || $this->isArg('setup') || $this->isArg('restore') || $this->isArg('clear')
             || $this->isArg('tests') || $this->isArg('integrations') || $this->isArg('remote')
             || $this->isArg('qunit') || $this->isArg('build')
             || $this->getArg('setup-integration')
             || $this->isArg('run-script')
-        )) {
-            return false;
-        } else {
-            $ret = true;
-            foreach ($this->_cmds as $cmd) {
-                $ret = $cmd->validateArgs() ? $ret : false;
-            }
-            return $ret;
-        }
+        );
     }
 
     protected function _getNewEnvironment()

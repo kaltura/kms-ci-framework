@@ -146,7 +146,7 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
      */
     public function setup()
     {
-        if ($this->_integration->isRunningKmigRunnerCommand) {
+        if (isset($this->_integration->isRunningKmigRunnerCommand) && $this->_integration->isRunningKmigRunnerCommand) {
             return true;
         } else {
             /** @var KmsCi_Environment_PhpmigHelper $helper */

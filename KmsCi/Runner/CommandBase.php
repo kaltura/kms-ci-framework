@@ -12,7 +12,7 @@ class KmsCi_Runner_CommandBase {
 
     public function validateArgs()
     {
-        return true;
+        return false;
     }
 
     public function run()

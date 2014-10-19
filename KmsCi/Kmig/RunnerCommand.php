@@ -9,7 +9,7 @@ class KmsCi_Kmig_RunnerCommand extends KmsCi_Runner_CommandBase {
 
     public function validateArgs()
     {
-        return true;
+        return ($this->_runner->getArg('kmig', '') != '');
     }
 
     public function run()
@@ -40,7 +40,14 @@ class KmsCi_Kmig_RunnerCommand extends KmsCi_Runner_CommandBase {
 
     public function getHelpData()
     {
-        return array();
+        return array(
+            'kaltura-migrations' => array('Kaltura Migrations',
+                'kmig' =>
+                    "  --kmig INTEGID               run the phpmig command in the context of the given integration id\n"
+                   ."                               prefix parameters to php mig with --kmig e.g.:\n"
+                   ."                               kmsci --kmig INTEGID --kmig-init"
+                )
+        );
     }
 
 } 

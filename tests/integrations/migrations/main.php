@@ -13,6 +13,8 @@ class IntegrationTests_migrations extends KmsCi_Runner_IntegrationTest_Base {
     public function setup()
     {
         if (parent::setup()) {
+            // delete the migrations cache file - so it will start everything from scratch
+            $this->_runner->getUtilHelper()->softUnlink($this->getIntegrationPath().'/.kmig.phpmig.data');
             $this->_kmigHelper = new KmsCi_Kmig_IntegrationHelper($this);
             return $this->_kmigHelper->setup();
         } else {
