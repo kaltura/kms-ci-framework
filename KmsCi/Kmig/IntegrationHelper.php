@@ -8,7 +8,7 @@
 class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_Base {
 
     /** @var  \Kmig\Container */
-    protected $_container;
+    protected $_container = null;
 
     protected function _getEnvParams()
     {
@@ -127,7 +127,8 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
      */
     public function getMigrator()
     {
-        return $this->_container['migrator'];
+        $container = $this->getContainer();
+        return $container['migrator'];
     }
 
     /**
@@ -135,15 +136,22 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
      */
     public function getClient()
     {
-        return $this->_container['client'];
+        $container = $this->getContainer();
+        return $container['client'];
     }
 
-    /**
-     * @param $integId
-     * @param $integrationPath string
-     * @param null $envParams
-     * @return bool
-     */
+    public function getContainer()
+    {
+        if (empty($this->_container)) {
+            $container = array();
+            require_once($this->_integration->getIntegrationPath().'/phpmig.php');
+            $this->_container = $container;
+            $datafilename = $this->_integration->getIntegrationPath().'/.kmig.phpmig.data';
+            \Kmig\Helper\Phpmig\KmigAdapter::setContainerValuesFromDataFile($this->_container, $datafilename);
+        }
+        return $this->_container;
+    }
+
     public function setup()
     {
         if (isset($this->_integration->isRunningKmigRunnerCommand) && $this->_integration->isRunningKmigRunnerCommand) {
@@ -154,11 +162,7 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
             if (!$helper->exec($this->_getEnvParams(), $this->_integration->getIntegrationPath().'/phpmig.php', array('migrate'))) {
                 return false;
             } else {
-                $container = array();
-                require_once($this->_integration->getIntegrationPath().'/phpmig.php');
-                $this->_container = $container;
-                $datafilename = $this->_integration->getIntegrationPath().'/.kmig.phpmig.data';
-                \Kmig\Helper\Phpmig\KmigAdapter::setContainerValuesFromDataFile($this->_container, $datafilename);
+                $this->getContainer();
                 return true;
             }
         }

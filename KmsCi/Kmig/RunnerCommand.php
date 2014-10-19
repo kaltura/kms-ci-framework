@@ -7,6 +7,12 @@
 
 class KmsCi_Kmig_RunnerCommand extends KmsCi_Runner_CommandBase {
 
+    protected function _getIntegrationHelper($integration)
+    {
+        $helper = new KmsCi_Kmig_IntegrationHelper($integration);
+        return $helper;
+    }
+
     public function validateArgs()
     {
         return ($this->_runner->getArg('kmig', '') != '');
@@ -33,7 +39,7 @@ class KmsCi_Kmig_RunnerCommand extends KmsCi_Runner_CommandBase {
             $className = KmsCi_Runner_IntegrationTests::getIntegrationClassById($integid, $this->_runner);
             /** @var KmsCi_Runner_IntegrationTest_Base $integration */
             $integration = new $className($this->_runner, $integid);
-            $helper = new KmsCi_Kmig_IntegrationHelper($integration);
+            $helper = $this->_getIntegrationHelper($integration);
             return $helper->runRunnerCommand($params);
         }
     }
