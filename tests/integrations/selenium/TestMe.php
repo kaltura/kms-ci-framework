@@ -13,6 +13,13 @@ class KmsCiFramework_TestMe extends KmsCi_PHPUnit_TestCase_PhpWebdriverBrowsers 
         $this->assertEquals('Selenium Tests!', $d->getTitle());
     }
 
+    public function testEnvironment()
+    {
+        $runner = KmsCi_Bootstrap::getRunner();
+        $integration = KmsCi_Bootstrap::getIntegration($runner);
+        $this->assertEquals('selenium', $integration->getIntegrationId());
+    }
+
 }
 
 KmsCiFramework_TestMe::$browsers = KmsCi_Runner_IntegrationTest_Helper_Phpunit::getTestBrowsers();

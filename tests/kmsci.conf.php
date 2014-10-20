@@ -44,4 +44,7 @@ $config = array(
      */
     // path to look for integration test directories in
     'integrationTestsPath' => __DIR__.'/integrations',
+
+    // this key is used for testing
+    'FOO' => 'BAR',
 );

@@ -12,6 +12,7 @@ class KmsCiFramework_CliRunner extends KmsCi_CliRunnerAbstract {
     {
         $cmd = new KmsCi_Kmig_RunnerCommand($this);
         $this->addCommand($cmd);
+        $this->_args['FOO'] = 'BAR';
     }
 
     protected function _run()

@@ -10,6 +10,7 @@ class KmsCi_Environment_CasperHelper extends KmsCi_Environment_BaseHelper {
 
     public function test($jsFilename, $logDumpFilename, $params)
     {
+        $params['kmscienv'] = json_encode($this->_runner->exportEnvironment());
         $escapedparams = '';
         foreach ($params as $key=>$value) {
             $escapedparams .= ' '.escapeshellarg('--'.$key.'='.$value);

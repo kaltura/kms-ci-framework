@@ -165,5 +165,14 @@ abstract class KmsCi_Runner_IntegrationTest_Base {
         }
     }
 
+    public function exportEnvironment()
+    {
+        return array(
+            'outputPath' => $this->getOutputPath(),
+            'integrationPath' => $this->getIntegrationPath(),
+            'integrationId' => $this->getIntegrationId(),
+        );
+    }
+
 }
 
