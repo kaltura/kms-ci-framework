@@ -1,7 +1,7 @@
 <?php
 
 
-class Initial extends \Kmig\Helper\Phpmig\KmigMigration
+class Initial extends KmsCi_Kmig_Migration
 {
 
     

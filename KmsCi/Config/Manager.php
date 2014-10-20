@@ -9,32 +9,17 @@ class KmsCi_Config_Manager {
 
     public function getConfig()
     {
-        $parts = explode(DIRECTORY_SEPARATOR, $this->_path);
-        $fullparts = array('/etc');
-        $lastpart = '';
-        $first = true;
-        foreach ($parts as $part) {
-            if ($first) {
-                $fullparts[] = DIRECTORY_SEPARATOR;
-                $first = false;
-            } else {
-                $fullpart = $lastpart.DIRECTORY_SEPARATOR.$part;
-                $fullparts[] = $fullpart;
-                $lastpart = $fullpart;
-            }
-        }
+        $configFiles = array(
+            '/etc/kmsci.conf.php',
+            $this->_path.'/kmsci.conf.php',
+            $this->_path.'/kmsci.conf.local.php'
+        );
         $merged_configs = array();
-        foreach ($fullparts as $part) {
-            if (file_exists($part.DIRECTORY_SEPARATOR.'kmsci.conf.php')) {
+        foreach ($configFiles as $configFile)
+        {
+            if (file_exists($configFile)) {
                 $config = array();
-                require($part.DIRECTORY_SEPARATOR.'kmsci.conf.php');
-                $merged_configs = array_merge($merged_configs, $config);
-            }
-        }
-        foreach ($fullparts as $part) {
-            if (file_exists($part.DIRECTORY_SEPARATOR.'kmsci.conf.local.php')) {
-                $config = array();
-                require($part.DIRECTORY_SEPARATOR.'kmsci.conf.local.php');
+                require($configFile);
                 $merged_configs = array_merge($merged_configs, $config);
             }
         }

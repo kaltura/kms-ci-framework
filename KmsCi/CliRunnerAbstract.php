@@ -7,14 +7,20 @@ abstract class KmsCi_CliRunnerAbstract {
     protected $_config = array();
     protected $_args = array();
 
+    protected $_configPath;
+
+    protected $_unparsedArgs = array();
+
     /** @var KmsCi_Runner_CommandBase[]  */
     protected $_cmds = array();
 
     /** @var  KmsCi_Environment */
     protected $_environment;
 
-    public function __construct($config, $args)
+    public function __construct($config, $args, $configPath)
     {
+        $this->_configPath = $configPath;
+        $this->_unparsedArgs = $args;
         $this->_args = $this->_parseArgs($args);
         $this->_config = $this->_overrideConfig($config);
         $this->_environment = $this->_getNewEnvironment();
@@ -427,6 +433,16 @@ abstract class KmsCi_CliRunnerAbstract {
     public function addCommand($cmd)
     {
         $this->_cmds[] = $cmd;
+    }
+
+    public function getConfigPath()
+    {
+        return $this->_configPath;
+    }
+
+    public function getUnparsedArgs()
+    {
+        return $this->_unparsedArgs;
     }
 
 }
