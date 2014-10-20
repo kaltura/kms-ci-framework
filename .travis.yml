@@ -7,6 +7,7 @@ before_script:
   - python -m SimpleHTTPServer &
   - sleep 5
 script:
+  - npm install -g casperjs
   - composer install
   - cd tests
   - ../bin/kmsci -a
