@@ -12,7 +12,15 @@ class KmsCi_Kmig_Migration extends \Kmig\Helper\Phpmig\KmigMigration {
      */
     protected function _runner()
     {
-        return $this->_container['kmsci.runner'];
+        return KmsCi_Bootstrap::getRunner();
     }
 
-} 
+    /**
+     * @return KmsCi_Runner_IntegrationTest_Base
+     */
+    protected function _integration()
+    {
+        return KmsCi_Bootstrap::getIntegration($this->_runner());
+    }
+
+}

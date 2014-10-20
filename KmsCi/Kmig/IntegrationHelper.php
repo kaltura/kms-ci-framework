@@ -32,6 +32,7 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
         }
         $envParams['KMSCI_RUNNER_PATH'] = $this->_runner->getConfigPath();
         $envParams['KMSCI_RUNNER_ARGS'] = json_encode($this->_runner->getUnparsedArgs());
+        $envParams['KMSCI_INTEGRATION_ID'] = $this->_integration->getIntegrationId();
         return $envParams;
     }
 
