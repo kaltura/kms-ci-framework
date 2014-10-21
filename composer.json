@@ -18,7 +18,6 @@
         "classmap": ["KmsCi/"]
     },
     "bin": ["bin/kmsci"],
-    "minimum-stability": "dev",
     "require": {
         "facebook/webdriver": "dev-master",
         "phpunit/phpunit": "4.3.*",
