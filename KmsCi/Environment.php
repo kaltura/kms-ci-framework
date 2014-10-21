@@ -59,11 +59,11 @@ class KmsCi_Environment {
     public function log($str)
     {
         // hide sensitive values
-        $hideKeys = array('sauceLabsLogin', 'adminSecret', 'adminConsolePassword', 'defaultPassword');
+        $hideKeys = array('password', 'secret', 'login');
         $hideKeys = array_merge($hideKeys, $this->_runner->getConfig('hideConfigKeys', array()));
         foreach ($hideKeys as $k) {
             foreach ($this->_runner->getConfig() as $ck => $cv) {
-                if (strpos($ck, $k) !== false) {
+                if (strpos(strtolower($ck), strtolower($k)) !== false) {
                     if (!empty($cv)) {
                         $str = str_replace($cv, '*****', $str);
                     }

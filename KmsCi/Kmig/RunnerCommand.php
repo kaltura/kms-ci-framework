@@ -7,10 +7,13 @@
 
 class KmsCi_Kmig_RunnerCommand extends KmsCi_Runner_CommandBase {
 
+    /**
+     * @param $integration
+     * @return KmsCi_Kmig_IntegrationHelper
+     */
     protected function _getIntegrationHelper($integration)
     {
-        $helper = new KmsCi_Kmig_IntegrationHelper($integration);
-        return $helper;
+        return KmsCi_Kmig_IntegrationHelper::getInstance($integration);
     }
 
     public function validateArgs()
