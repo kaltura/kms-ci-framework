@@ -304,7 +304,6 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
             if (file_exists($this->_integration->getIntegrationPath().'/.kmig.phpmig.data')) {
                 $this->_extraStatusDetails();
             }
-
         }
         $this->_postMigrate();
         return $ok;

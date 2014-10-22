@@ -21,7 +21,9 @@ class KmsCi_Environment_PhpmigHelper extends KmsCi_Environment_BaseHelper {
                 $cmd .= '--'.$k.'='.escapeshellarg($v);
             }
         };
-        return $this->_runner->getUtilHelper()->exec($cmd);
+        $ans = $this->_runner->getUtilHelper()->exec($cmd);
+        \Kmig\Migrator::clearCaches();
+        return $ans;
     }
 
     public function getNewPhpmig($envParams, $bootstrapFile)
