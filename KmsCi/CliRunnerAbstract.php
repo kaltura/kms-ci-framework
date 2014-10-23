@@ -19,6 +19,7 @@ abstract class KmsCi_CliRunnerAbstract {
 
     public function __construct($config, $args, $configPath)
     {
+        KmsCi_Bootstrap::setRunner($this);
         $this->_configPath = $configPath;
         $this->_unparsedArgs = $args;
         $this->_args = $this->_parseArgs($args);
@@ -409,8 +410,7 @@ abstract class KmsCi_CliRunnerAbstract {
 
     public function run()
     {
-        echo "config: ";
-        $this->log(print_r($this->_config, true));
+        $this->verbose("config: ".print_r($this->_config, true));
         if (!$this->_validateArgs()) {
             $this->help();
         } elseif ($this->_run()) {

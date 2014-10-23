@@ -10,7 +10,11 @@ if (file_exists(__DIR__.'/../../../autoload.php')) require_once(__DIR__.'/../../
 // and I need:     kms-ci-framework/vendor/autoload.php
 else require_once(__DIR__.'/../vendor/autoload.php');
 
-$configPath = getcwd();
+$configPath = getenv('KMSCI_RUNNER_PATH');
+if (empty($configPath)) {
+    $configPath = getcwd();
+    putenv('KMSCI_RUNNER_PATH='.$configPath);
+}
 $configManager = new KmsCi_Config_Manager($configPath);
 $config = $configManager->getConfig();
 
@@ -32,6 +36,7 @@ if (!array_key_exists('CliRunnerFile', $config)) {
     if (!class_exists($className)) {
         errorhelp('The class defined in CliRunnerClass does not exist ("'.$className.'")');
     } else {
+        /** @var KmsCi_CliRunnerAbstract $runner */
         $runner = new $className($config, $argv, $configPath);
         $runner->run();
     }

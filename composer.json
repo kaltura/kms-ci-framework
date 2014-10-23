@@ -21,6 +21,6 @@
     "require": {
         "facebook/webdriver": "dev-master",
         "phpunit/phpunit": "4.3.*",
-	"kaltura/kmig": "dev-master"
+        "kaltura/kmig": "dev-master"
     }
 }
