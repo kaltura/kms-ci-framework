@@ -42,5 +42,7 @@ $config = array(
         // in this example "migrations" is the name of the integration
         'kmig.migrations.partnerId' => '9999999', // KALTURA_PARTNER_ID
         'kmig.migrations.adminSecret' => 'aabbccddeeffgghhii', // KALTURA_ADMIN_SECRET
+        'kmig.partnerEmail' => '', // the partner's kmc user
+        'kmig.partnerPassword' => '', // the partner's kmc password
     **/
 );
