@@ -21,7 +21,9 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
             'defaultServerDomain' => 'KALTURA_DEFAULT_SERVER_DOMAIN',
             'defaultPassword' => 'KALTURA_DEFAULT_PASSWORD',
             'partnerId' => 'KALTURA_PARTNER_ID',
-            'adminSecret' => 'KALTURA_ADMIN_SECRET'
+            'adminSecret' => 'KALTURA_ADMIN_SECRET',
+            'kmcAdminUser' => 'KALTURA_PARTNER_PASSWORD',
+            'kmcAdminPassword' => 'KALTURA_PARTNER_EMAIL',
         );
         foreach ($keys as $configKey => $envParamKey) {
             // try first from specific integration configuration, then from default
