@@ -19,6 +19,7 @@ abstract class KmsCi_CliRunnerAbstract {
 
     public function __construct($config, $args, $configPath)
     {
+        KmsCi_Bootstrap::setRunner($this);
         $this->_configPath = $configPath;
         $this->_unparsedArgs = $args;
         $this->_args = $this->_parseArgs($args);

@@ -6,6 +6,11 @@ class KmsCi_Bootstrap {
 
     protected static $_integration = null;
 
+    public static function setRunner($runner)
+    {
+        self::$_runner = $runner;
+    }
+
     /**
      * @return KmsCi_CliRunnerAbstract
      */

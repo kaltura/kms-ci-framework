@@ -26,9 +26,9 @@ class KmsCi_Environment_PhpmigHelper extends KmsCi_Environment_BaseHelper {
         return $ans;
     }
 
-    public function getNewPhpmig($envParams, $bootstrapFile)
+    public function getNewPhpmig($envParams, $bootstrapFile, $integId)
     {
-        $phpmig = new KmsCi_Environment_PhpmigHelper_Phpmig($envParams, $bootstrapFile);
+        $phpmig = new KmsCi_Environment_PhpmigHelper_Phpmig($envParams, $bootstrapFile, $integId);
         return $phpmig;
     }
 
@@ -44,7 +44,7 @@ class KmsCi_Environment_PhpmigHelper_Phpmig {
     protected $_hasPhpmig = false;
     protected $_hasKmigData = false;
 
-    public function __construct($envParams, $kmigpath)
+    public function __construct($envParams, $kmigpath, $integId)
     {
         foreach ($envParams as $k=>$v) {
             putenv($k.'='.$v);
@@ -54,7 +54,7 @@ class KmsCi_Environment_PhpmigHelper_Phpmig {
             $this->_hasPhpmig = true;
             require_once($kmigpath.'/phpmig.php');
             $this->_container = $container;
-            $datafilename = $kmigpath.'/.kmig.phpmig.data';
+            $datafilename = KmsCi_Kmig_IntegrationHelper::getInstanceByIntegrationId($integId)->getKmigPhpmigDataFileName();
             if (file_Exists($datafilename)) {
                 $this->_hasKmigData = true;
                 \Kmig\Helper\Phpmig\KmigAdapter::setContainerValuesFromDataFile($this->_container, $datafilename);

@@ -45,7 +45,7 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
 
     protected function _extraStatusDetails()
     {
-        $kmigdata = file_get_contents($this->_integration->getIntegrationPath().'/.kmig.phpmig.data');
+        $kmigdata = file_get_contents($this->getKmigPhpmigDataFileName());
         $kmigdata = json_decode($kmigdata, true);
         echo implode("\n", array(
             'serviceUrl: '.$kmigdata['serviceUrl'],
@@ -63,28 +63,14 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
         $phpmig = file_get_contents(__DIR__.'/phpmig.template.php');
         $phpmig = str_replace(array(
             '/**PRE_CODE**/',
-            '\Kmig\Container',
-            'kmsci_integration_INTEGID',
-            '\Kmig\Helper\Phpmig\KmigAdapter',
+            'INTEGID',
             '/**POST_CODE**/'
         ), array(
             $this->_getPhpmigFileContents_preCode(),
-            $this->_getPhpmigFileContents_kmigContainer(),
-            'kmsci_integration_'.$integId,
-            $this->_getPhpmigFileContents_kmigAdapter(),
+            $integId,
             $this->_getPhpmigFileContents_postCode(),
         ), $phpmig);
         return $phpmig;
-    }
-
-    protected function _getPhpmigFileContents_kmigContainer()
-    {
-        return '\Kmig\Container';
-    }
-
-    protected function _getPhpmigFileContents_kmigAdapter()
-    {
-        return '\Kmig\Helper\Phpmig\KmigAdapter';
     }
 
     protected function _getPhpmigFileContents_preCode()
@@ -239,7 +225,7 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
         if (empty($this->_phpmig)) {
             /** @var KmsCi_Environment_PhpmigHelper $helper */
             $helper = $this->_runner->getEnvironment()->getHelper('phpmig');
-            $this->_phpmig = $helper->getNewPhpmig($this->_getEnvParams(), $this->_integration->getIntegrationPath());
+            $this->_phpmig = $helper->getNewPhpmig($this->_getEnvParams(), $this->_integration->getIntegrationPath(), $this->_integration->getIntegrationId());
         }
         return $this->_phpmig;
     }
@@ -276,6 +262,9 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
         /** @var KmsCi_Environment_PhpmigHelper $helper */
         $helper = $runner->getEnvironment()->getHelper('phpmig');
         $bootstrapfile = in_array('init', $params) ? '' : $integration->getIntegrationPath().'/phpmig.php';
+        if (in_array('generate', $params) && count($params) > 1) {
+            $params[count($params)-1] = $params[count($params)-1].ucfirst($integration->getIntegrationId()).'Integ';
+        }
         $ok = $helper->exec($this->_getEnvParams(), $bootstrapfile, $params);
         chdir($curcwd);
         $runner->getUtilHelper()->setExecPassthru(false);
@@ -301,12 +290,47 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
                 file_put_contents($filename, $this->_getMigrationFileContents($migrationName));
             }
         } elseif (in_array('status', $params)) {
-            if (file_exists($this->_integration->getIntegrationPath().'/.kmig.phpmig.data')) {
+            if (file_exists($this->getKmigPhpmigDataFileName())) {
                 $this->_extraStatusDetails();
             }
         }
         $this->_postMigrate();
         return $ok;
+    }
+
+    public function getKmigPhpmigDataFileName()
+    {
+        $configPath = $this->_runner->getConfigPath();
+        if ($configPath == $this->_runner->getConfig('rootPath')) {
+            $dataFile = $this->_integration->getIntegrationFilename('.kmig.phpmig.data');
+        } else {
+            $dataFile = $configPath.'/.kmig.phpmig.data.'.$this->_integration->getIntegrationId();
+        }
+        return $dataFile;
+    }
+
+    public function bootstrapContainer()
+    {
+        $container = new \Kmig\Container(array(
+            'Kmig_Migrator_ID' => 'kmsci_integration_'.$this->_integration->getIntegrationId(),
+            'Kmig_Phpmig_Adapter_DataFile' => $this->getKmigPhpmigDataFileName(),
+        ));
+
+        $container['phpmig.adapter'] = function($c) {
+            return new \Kmig\Helper\Phpmig\KmigAdapter($c);
+        };
+
+        $container['phpmig.migrations_path'] = $this->_integration->getIntegrationFilename('migrations');
+
+        return $container;
+    }
+
+    public static function getInstanceByIntegrationId($integId)
+    {
+        $runner = KmsCi_Bootstrap::getRunner();
+        $className = KmsCi_Runner_IntegrationTests::getIntegrationClassById($integId, $runner);
+        $integration = new $className($runner, $integId);
+        return KmsCi_Kmig_IntegrationHelper::getInstance($integration);
     }
 
     /**
@@ -316,11 +340,11 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
     public static function getInstance($integration)
     {
         $integId = $integration->getIntegrationId();
-        if (!array_key_exists($integId, self::$_instances)) {
+        if (!array_key_exists($integId, KmsCi_Kmig_IntegrationHelper::$_instances)) {
             $className = isset($integration->kmigHelperClassName) ? $integration->kmigHelperClassName : 'KmsCi_Kmig_IntegrationHelper';
-            self::$_instances[$integId] = new $className($integration);
+            KmsCi_Kmig_IntegrationHelper::$_instances[$integId] = new $className($integration);
         }
-        return self::$_instances[$integId];
+        return KmsCi_Kmig_IntegrationHelper::$_instances[$integId];
     }
 
 } 

@@ -36,15 +36,16 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
         $tests = new $clsname($this->_runner, $integId);
         if (!$tests->setup()) {
             echo "Failed to setup integration\n";
-            return false;
+            $ret = false;
         } else {
             $filterTests = $this->_runner->getArg('filter-tests', '');
             if (empty($filterTests)) {
-                return true;
+                $ret = true;
             } else {
-                return $tests->runSetupTests($filterTests);
+                $ret = $tests->runSetupTests($filterTests);
             }
         }
+        return $ret;
     }
 
     protected function _runAll($params)
@@ -102,7 +103,8 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
     public function setupIntegration($integId)
     {
         if ($className = self::getIntegrationClassById($integId, $this->_runner)) {
-            return $this->_setup($integId, $className);
+            $ret = $this->_setup($integId, $className);
+            return $ret;
         } else {
             return false;
         }

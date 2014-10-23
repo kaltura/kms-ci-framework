@@ -36,6 +36,11 @@ class KmsCi_PHPUnit_TestCase_PhpWebdriverBrowsers extends PHPUnit_Framework_Test
         if ($this->driver) $this->driver->quit();
     }
 
+    public function getCurrentBrowserName()
+    {
+        return self::getBrowserTestName($this->browser);
+    }
+
     public static function getBrowserTestName($browser)
     {
         if (array_key_exists('name', $browser)) {
