@@ -88,6 +88,7 @@ class KmsCi_PHPUnit_TestCase_PhpWebdriverBrowsers extends PHPUnit_Framework_Test
         if (array_key_exists('sauce', $browser)) {
             echo "\nhttps://saucelabs.com/tests/".$driver->getSessionID()."\n";
         }
+        $driver->manage()->window()->setSize(new \WebDriverDimension(1024, 768));
         return $driver;
     }
 
