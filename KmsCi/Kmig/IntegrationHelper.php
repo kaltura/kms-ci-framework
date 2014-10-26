@@ -194,6 +194,15 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
 
     }
 
+    /*
+     * this method will run after every single migration
+     * you should use it to save intermediate state in case a migration fails unexpectedly
+     */
+    public function postEachMigration()
+    {
+
+    }
+
     /**
      * @return \Kmig\Migrator
      */
@@ -317,7 +326,7 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
         ));
 
         $container['phpmig.adapter'] = function($c) {
-            return new \Kmig\Helper\Phpmig\KmigAdapter($c);
+            return new KmsCi_Kmig_Adapter($c);
         };
 
         $container['phpmig.migrations_path'] = $this->_integration->getIntegrationFilename('migrations');
