@@ -11,6 +11,7 @@ class KmsCi_Config_Manager {
     {
         $configFiles = array(
             '/etc/kmsci.conf.php',
+            __DIR__.'/../../../../../kmsci.conf.php',
             $this->_path.'/kmsci.conf.php',
             $this->_path.'/kmsci.conf.local.php'
         );
