@@ -7,6 +7,21 @@
 
 class KmsCi_Kmig_RunnerCommand extends KmsCi_Runner_CommandBase {
 
+    public function __construct($runner)
+    {
+        parent::__construct($runner);
+        if ($this->_runner->isArg('kmig-destroy')) {
+            $this->_runner->getEnvironment()->on('IntegrationTest::_postRun', function($integId, $integration){
+                $helper = KmsCi_Kmig_IntegrationHelper::getInstance($integration);
+                if ($helper->getMigrator()) {
+                    echo "\ndestroying partner...\n";
+                    $helper->getMigrator()->destroy();
+                }
+                return true;
+            });
+        }
+    }
+
     /**
      * @param $integration
      * @return KmsCi_Kmig_IntegrationHelper
@@ -54,8 +69,11 @@ class KmsCi_Kmig_RunnerCommand extends KmsCi_Runner_CommandBase {
                 'kmig' =>
                     "  --kmig INTEGID               run the phpmig command in the context of the given integration id\n"
                    ."                               prefix parameters to php mig with --kmig e.g.:\n"
-                   ."                               kmsci --kmig INTEGID --kmig-init"
-                )
+                   ."                               kmsci --kmig INTEGID --kmig-init",
+                'kmig-destroy' =>
+                    "  --kmig-destroy               only applicable when creating a new partner on each run, deletes the partner after running\n"
+                   ."                               only relevant when running migration tests, does no work on setup or with --kmig parameter",
+            ),
         );
     }
 

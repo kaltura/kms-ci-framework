@@ -2,17 +2,23 @@
 
 class IntegrationTests_testproj extends KmsCi_Runner_IntegrationTest_Base {
 
+    public function getIntegrationPath()
+    {
+        return __DIR__;
+    }
+
     protected function _execKmsci($params)
     {
-        if (!chdir($this->_runner->getConfig('buildPath').'/testproj')) {
-            echo "FAILED\n";
-            return false;
-        } else {
+        $kmscipath = $this->_runner->getConfig('buildPath').'/testproj';
+//        if (!chdir($this->_runner->getConfig('buildPath').'/testproj')) {
+//            echo "FAILED\n";
+//            return false;
+//        } else {
             $kmsci = $this->_runner->getUtilHelper()->getBin('kmsci');
             if ($kmsci == 'kmsci') {
                 $kmsci = __DIR__.'/../../../bin/kmsci';
             }
-            $cmd = $kmsci.' -t';
+            $cmd = 'KMSCI_RUNNER_PATH='.escapeshellarg($kmscipath).' '.$kmsci.' '.$params;
             if ($this->_runner->getUtilHelper()->exec($cmd)) {
                 return $this->_runner->getUtilHelper()->getExecOutput();
             } else {
@@ -23,7 +29,7 @@ class IntegrationTests_testproj extends KmsCi_Runner_IntegrationTest_Base {
                 echo implode("\n", $output)."\n";
                 return false;
             }
-        }
+//        }
     }
 
     protected function _kmsciTest($params)

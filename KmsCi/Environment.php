@@ -8,6 +8,8 @@ class KmsCi_Environment {
     /** @var KmsCi_Environment_BaseHelper[] */
     protected $_helpers = array();
 
+    protected $_registeredEventsCallbacks = array();
+
     public function __construct($runner)
     {
         $this->_runner = $runner;
@@ -74,14 +76,35 @@ class KmsCi_Environment {
         return true;
     }
 
+    public function on($evtName, $callback)
+    {
+        if (!array_key_exists($evtName, $this->_registeredEventsCallbacks)) {
+            $this->_registeredEventsCallbacks[$evtName] = array();
+        }
+        $this->_registeredEventsCallbacks[$evtName][] = $callback;
+    }
+
     public function invoke($evtName, $evtParams = array(), $breakOnError = true)
     {
+        $stop = false;
         $ret = true;
         foreach ($this->_getHelperNames($evtName, $evtParams) as $helperName) {
             $helper = $this->getHelper($helperName);
             if (!is_null($helper)) {
                 if (!$helper->invoke($evtName, $evtParams)) {
                     $this->error('failed invoke of "'.$evtName.'", with params: '.print_r($evtParams, true));
+                    $ret = false;
+                    if ($breakOnError) {
+                        $stop = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!$stop && array_key_exists($evtName, $this->_registeredEventsCallbacks)) {
+            foreach ($this->_registeredEventsCallbacks[$evtName] as $callback) {
+                if (!call_user_func_array($callback, $evtParams)) {
+                    $this->error('failed invoke callback of "'.$evtName.'"');
                     $ret = false;
                     if ($breakOnError) break;
                 }
