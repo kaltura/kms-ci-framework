@@ -311,7 +311,12 @@ class KmsCi_Kmig_IntegrationHelper extends KmsCi_Runner_IntegrationTest_Helper_B
     {
         $configPath = $this->_runner->getConfigPath();
         if ($configPath == $this->_runner->getConfig('rootPath')) {
-            $dataFile = $this->_integration->getIntegrationFilename('.kmig.phpmig.data');
+            $tmpPath = $this->_runner->getConfig('migrationsKmigDataPath', '');
+            if (empty($tmpPath)) {
+                $dataFile = $this->_integration->getIntegrationFilename('.kmig.phpmig.data');
+            } else {
+                $dataFile = $tmpPath.'/.kmig.phpmig.data.'.$this->_integration->getIntegrationId();
+            }
         } else {
             $dataFile = $configPath.'/.kmig.phpmig.data.'.$this->_integration->getIntegrationId();
         }

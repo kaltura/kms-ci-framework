@@ -1,7 +1,9 @@
 Full documentation guide
 ========================
 
-This guide will detail the concepts and methodologies that Kms-ci-framework implements. It should be possible to follow this guide without using the Kms-ci-framework code itself, it can be used as a generic guide to CI processes and methodologies.
+This guide will detail the concepts and methodologies that Kms-ci-framework implements.
+
+It should be possible to follow this guide without using the Kms-ci-framework code itself, it can be used as a generic guide to CI processes and methodologies.
 
 Before starting this guide you should be familiar with :doc:`Basic continuous integration concepts <noobs>`.
 
@@ -15,155 +17,315 @@ We will develope the project using TDD methodology - where we will write the tes
 Setting up kms-ci-framework for our project
 -------------------------------------------
 
-If you are not going to use Kms-ci-framework you can skip to next section: `the frontpage`_.
-
-You should install Kms-ci-framework first, see the :doc:`installation guide <install>`.
-
 Start by creating a directory for our project::
 
+    >>~ shell
     $ mkdir cv
     $ cd cv
+    >>! chdir('cv');
 
-Using TDD methodology we write code only to let some test pass. So, the first "test" is to run the kms-ci-framework code::
+kms-ci-framework uses composer, so add the kms-ci-framework to your require, or create a new file::
 
-    cv$ kmsci
+    >>~ file: composer.json
+    {
+        "minimum-stability": "dev",
+        "require":{
+            "kaltura/kms-ci-framework": "dev-master"
+        }
+    }
 
-You will get an error along these lines: "CliRunnerFile configuration key does not exist"
+Install composer locally (if you don't have it globally already)::
 
-Kms-ci-framework scans for configuration files in your current directory. It looks for a file called "kmsci.conf.php". Let's create that file now::
+    >>~ shell-passthru
+    $ php -r "readfile('https://getcomposer.org/installer');" | php
 
-    cv$ touch kmsci.conf.php
+Install the dependencies::
 
-And, using your favorite editor, input the following content::
+    >>~ shell-passthru
+    $ php composer.phar install
 
+Run the kmsci binary - you will get an error message::
+
+    >>~ shell
+    $ vendor/bin/kmsci
+    >>: $this->assertContains('CliRunnerFile configuration key does not exist', $this->output);
+
+kms-ci-framework works with several configuration files, which are loaded in order and any keys defined in later configuration files overrides earlier values.
+
+For more info about the configuration files, see :doc:`Configuration files <configs>`.
+
+Let's create a simple configuration file that will let our code run::
+
+    >>~ file: kmsci.conf.php
     <?php
     $config = array(
         'CliRunnerFile' => __DIR__.'/CliRunner.php',
     );
 
-After running "kmsci" you will get an error: "The file defined in CliRunnerFile does not exist". Let's create that file::
+The CliRunner is the kms-ci-framework obejct.
 
-    cv$ touch CliRunner.php
+Run the kmsci binary again - you will get an error message because the CliRunner.php file does not exist::
 
-After running "kmsci" You will get an error: "CliRunnerClass configuration key does not exist". Let's add it to kmsci.conf.php::
+    >>~ shell
+    $ vendor/bin/kmsci
+    >>: $this->assertContains('The file defined in CliRunnerFile does not exist', $this->output);
 
-    'CliRunnerClass' => 'CliRunner',
+Let's create it::
 
-After running "kmsci" You will get an error: "The class defined in CliRunnerClass does not exist". Let's define it - edit CliRunner.php::
-
+    >>~ file: CliRunner.php
     <?php
+    class CliRunner extends KmsCi_CliRunnerAbstract {
+    }
 
-    class CliRunner extends KmsCi_CliRunnerAbstract {}
+Let's run kmsci again::
 
-KmsCi_CliRunnerAbstract is the main class of Kms-ci-framework. It will be defined (along with all the kms-ci-framework classes) when you run kmsci.
+    >>~ shell
+    $ vendor/bin/kmsci
+    >>: $this->assertContains('CliRunnerClass configuration key does not exist', $this->output);
 
-Now, when you run "kmsci" you will get the default Kms-ci-framework help message.
+We get an error because we need to let the framework know about our CliRunner class name::
 
-The frontpage
--------------
+    >>~ file: kmsci.conf.php
+    <?php
+    $config = array(
+        'CliRunnerFile' => __DIR__.'/CliRunner.php',
+        'CliRunnerClass' => 'CliRunner',
+    );
 
-The first test we will run is to see if the frontpage web page is accessible. We do this using an integration test. We will do just the most minimal test that checks that when accessing the web page we get a 200 http status. This just makes sure everything is configured properly.
+Now, when you run kmsci you should get the help message::
+
+    >>~ shell
+    $ vendor/bin/kmsci
+    >>: $this->assertContains('usage: kmsci [OPTIONS]...', $this->output);
+
+
+Add an Integration test
+-----------------------
+
+The first test we will run is to see if a web page is accessible.
+
+We do this using an integration test.
+
+We will do just the most minimal test that checks that when accessing the web page we get a 200 http status.
+
+This just makes sure everything is configured properly.
 
 Setting up kms-ci-framework to run integration tests
 ----------------------------------------------------
 
-If you are not using kms-ci-framework you can skip to the next section: `Writing a screenshot test for the frontpage`_.
-
 To run integration tests in kms-ci-framework we pass the -i (or --integrations) parameter::
 
-    cv$ kmsci -i
+    >>~ shell
+    $ vendor/bin/kmsci -i
+    >>: $this->assertEquals('RunningintegrationtestsWARNING:nointegrationTestsPathOK', preg_replace('/\s+/', '', $this->output));
 
 You will get a warning: "WARNING: no integrationTestsPath" but the test will pass (because there aren't any tests).
 
-Let's create our main tests directory, and inside that our integration tests directory::
+In kms-ci-framework, each integration has it's own directory. There are 2 places where integrations can be located.
 
-    cv$ mkdir tests
-    cv$ mkdir tests/integrations
+* Under an integrationTestsPath - a single path under which there are multiple directories, each belonging to an integration
+* Anywhere else in the code-base - under a directory tests/integration/
 
-Now, we need to let kms-ci-framework know where the integration tests are located, add the following to kmsci.conf.php::
+In this example we will use the integrationTestsPath, see :doc:`Integration Tests <integtests>` for more details about placing the integration elsewhere.
 
-    'integrationTestsPath' => __DIR__.'/tests/integrations',
+Let's define where this path will be located in our kmsci.conf.php file::
+
+    >>~ file: kmsci.conf.php
+    <?php
+    $config = array(
+        'CliRunnerFile' => __DIR__.'/CliRunner.php',
+        'CliRunnerClass' => 'CliRunner',
+        'integrationTestsPath' => __DIR__.'/integrations',
+    );
+
+And, we need to create this directory::
+
+    >>~ shell-passthru
+    $ mkdir integrations
 
 Inside this integrations directory we can have several integration classes and each class can contain several tests. For now, we will just create a "main" integration::
 
-    cv$ mkdir tests/integrations/main
+    >>~ shell-passthru
+    $ mkdir integrations/main
 
 Each integration directory must have a main.php file with the integration class - tests/integrations/main/main.php::
 
+    >>~ file: integrations/main/main.php
     <?php
-
     class IntegrationTests_main extends KmsCi_Runner_IntegrationTest_Base {
-
     }
+
+Another required configuration parameter is the outputPath key::
+
+    >>~ shell-stderr
+    $ vendor/bin/kmsci -i
+    >>: $this->assertContains('key "outputPath" must be set in the configuration!', $this->output);
+
+This key specifies a directory where integrations output data will be stored::
+
+    >>~ file: kmsci.conf.php
+    <?php
+    $config = array(
+        'CliRunnerFile' => __DIR__.'/CliRunner.php',
+        'CliRunnerClass' => 'CliRunner',
+        'integrationTestsPath' => __DIR__.'/integrations',
+        'outputPath' => __DIR__.'/output',
+    );
+
+Now, we can run the integration tests::
+
+    >>~ shell
+    $ vendor/bin/kmsci -i
+    >>: $this->assertEquals('RunningintegrationtestsIntegrationTests_main:OK', preg_replace('/\s+/', '', $this->output));
 
 Writing a screenshot test for the frontpage
 -------------------------------------------
 
 Now, let's add our test method - this method will just try to get a screenshot of the frontpage::
 
-    public function testFrontpage()
-    {
-        $helper = new KmsCi_Runner_IntegrationTest_Helper_Screenshot($this);
-        return $helper->get('/', 1024, 768, 'frontpage');
+    >>~ file: integrations/main/main.php
+    <?php
+    class IntegrationTests_main extends KmsCi_Runner_IntegrationTest_Base {
+        public function testFrontpage()
+        {
+            $helper = new KmsCi_Runner_IntegrationTest_Helper_Screenshot($this);
+            return $helper->get('/', 1024, 768, 'frontpage');
+        }
     }
 
-Kms-ci-framework provides helpers for running common testing functionality. In this case we use the screenshot helper. This helper uses phantomjs to get the screenshot.
+Kms-ci-framework provides helpers for running common testing functionality.
+
+In this case we use the screenshot helper, this helper uses phantomjs to get the screenshot.
 
 This helper will detect if there is an http or php error when accessing the page and will also store a dump of the html received, http header and a screenshot of the page.
 
-Setting up kms-ci-framework to run the screenshot helper
---------------------------------------------------------
+Now, let's run our integration tests::
 
-You can skip to the next section if you are not using kms-ci-framework: `Testing the frontpage content`_.
+    >>~ shell-stderr
+    $ vendor/bin/kmsci -i
+    >>: $this->assertContains('your integration class should define the getAbsoluteUrl method', $this->output);
 
-Now, when you run "kmsci -i" you will get an exception: 'key "outputPath" must be set in the configuration!'. The outputPath configuration is where all the output of the different tests will be stored (log file, html dumps, screenshots etc.). Let's define it in kmsci.conf.php::
+We got an exception - "your integration class should define the getAbsoluteUrl method"
 
-    'outputPath' => __DIR__.'/.output',
+The exception is raise because when the screenshot helper gets a relative url it needs to determine the absolute url, it does it using the integration's getAbsoluteUrl method.
 
-And, we should also create this directory (when using source control, it should also be ignored)::
+It's better to always use relative urls becuase the domain might change between installations.
 
-    cv$ mkdir .output
+Let's add this method::
 
-Now, when running "kmsc -i" you will get another exception: "your integration class should define the getAbsoluteUrl method". The getAbsoluteUrl method is required to run the screenshot helper. It converts a relative url to absolute url. Let's define it, in tests/integrations/main/main.php::
-
-    public function getAbsoluteUrl($relativeUrl)
-    {
-        return $this->_runner->getConfig('baseUrl').$relativeUrl;
+    >>~ file: integrations/main/main.php
+    <?php
+    class IntegrationTests_main extends KmsCi_Runner_IntegrationTest_Base {
+        public function testFrontpage()
+        {
+            $helper = new KmsCi_Runner_IntegrationTest_Helper_Screenshot($this);
+            return $helper->get('/', 1024, 768, 'frontpage');
+        }
+        public function getAbsoluteUrl($relativeUrl)
+        {
+            return $this->_runner->getConfig('baseUrl').$relativeUrl;
+        }
     }
 
-In this case we get a configuration key called 'baseUrl' from the main runner. This key should be defined in the configuration but it should not be in source control as part of the project (because it might be differente on different machines). To set local configuration you can create a file kmsci.conf.local.php::
+In this case we get a configuration key called 'baseUrl' from the main runner.
 
+This key should be defined in the configuration but it should not be in source control as part of the project (because it might be differente on different machines).
+
+To set local configuration you can create a file kmsci.conf.local.php::
+
+    >>~ file: kmsci.conf.local.php
     <?php
-
     $config = array(
-        'baseUrl' => 'http://cvproject',
+        'baseUrl' => 'http://localhost:14398',
     );
 
-This configuration will be merged with the main configuration in kmsci.conf.php. Of course, you will have to setup a webserver at the relevant domain that will serve files from your cv directory.
+This configuration will be merged with the main configuration in kmsci.conf.php and override any keys in the kmsci.conf.php file.
 
-Also, to detect errors in the html source code, the screenshot helper needs to know the full root path of your project, add the following in kmsc.conf.php::
+For more information about the configuration files, see :doc:`Configuration files <configs>`.
 
-    'rootPath' => __DIR__,
+Let's run our integration test::
+
+    >>~ shell-stderr
+    $ vendor/bin/kmsci -i
+    >>: $this->assertEquals(1, $this->returnvar);
+    >>: $this->assertContains('got http error null', $this->output);
+
+Of course, it fails because we don't have a web server.
+
+so, let's create a web directory, which will contain the publicly available web files::
+
+    >>~ shell
+    $ mkdir web
+    $ echo "Hello World!" > index.html
+
+And, let's run a webserver on that directory (we use python here, but you can use any other simple webserver)::
+
+    >>~ shell-passthru
+    $ cd web
+    $ nohup python -m SimpleHTTPServer 14398 > /dev/null 2>&1 &
+    >>! if ($onlyForce) {echo "\n\$ nohup python -m SimpleHTTPServer 14398 > /dev/nul 2>&1 &\n";passthru('cd web && nohup python -m SimpleHTTPServer 14398 > /dev/null 2>&1 &');}
+    >>! register_shutdown_function(function(){ echo "\n\$ pkill -9 -f 14398\n";passthru('pkill -9 -f 14398'); });
+
+Of course, you will have to setup a webserver at the relevant domain that will serve files from your cv directory.
+
+Now, will our screenshot test run?::
+
+    >>~ shell-stderr
+    $ vendor/bin/kmsci -i
+    >>: $this->assertContains('key "rootPath" must be set in the configuration!', $this->output);
+
+Not yet, another important configuration value we need is the "rootPath" - this should point to the root path of your project::
+
+    >>~ file: kmsci.conf.php
+    <?php
+    $config = array(
+        'CliRunnerFile' => __DIR__.'/CliRunner.php',
+        'CliRunnerClass' => 'CliRunner',
+        'integrationTestsPath' => __DIR__.'/integrations',
+        'outputPath' => __DIR__.'/output',
+        'rootPath' => __DIR__
+    );
+
+Now, it will run::
+
+    >>~ shell
+    $ vendor/bin/kmsci -i
+    >>: $this->assertEquals(0, $this->returnvar);
 
 Testing the frontpage content
 -----------------------------
 
-After setting up the basic frontpage test, when we run "kmsci -i" the test might pass, so let's check if there is any relevant content in the page. tests/integrations/main/main.php::
+After setting up the basic frontpage test, when we run "kmsci -i" the test passes, so let's check if there is any relevant content in the page::
 
-    public function testFrontpage()
-    {
-        $helper = new KmsCi_Runner_IntegrationTest_Helper_Screenshot($this);
-        if (!$helper->get('/', 1024, 768, 'frontpage')) {
-            return false;
-        } elseif (strpos($helper->getLastHtmlContent(), 'Welcome to the frontpage of the test CV project!') === false) {
-            return $this->_runner->error(' FAILED - expected content was not found');
-        } else {
-            return true;
+    >>~ file: integrations/main/main.php
+    <?php
+    class IntegrationTests_main extends KmsCi_Runner_IntegrationTest_Base {
+        public function testFrontpage()
+        {
+            $helper = new KmsCi_Runner_IntegrationTest_Helper_Screenshot($this);
+            if (!$helper->get('/', 1024, 768, 'frontpage')) {
+                return false;
+            } elseif (strpos($helper->getLastHtmlContent(), 'Welcome to the frontpage of the test CV project!') === false) {
+                return $this->_runner->error(' FAILED - expected content was not found');
+            } else {
+                return true;
+            }
+        }
+        public function getAbsoluteUrl($relativeUrl)
+        {
+            return $this->_runner->getConfig('baseUrl').$relativeUrl;
         }
     }
 
-Now, we run the test again and it will fail. So, let's create the minimal code to let the test pass, create index.html::
+Now, the test will fail::
 
+    >>~ shell
+    $ vendor/bin/kmsci -i
+    >>: $this->assertNotEquals(0, $this->returnvar);
+
+Now, we run the test again and it will fail. So, let's create the minimal code to let the test pass::
+
+    >>~ file: web/index.html
     <html>
         <head></head>
         <body>
@@ -171,7 +333,11 @@ Now, we run the test again and it will fail. So, let's create the minimal code t
         </body>
     </html>
 
-Now the test will pass.
+Now the test will pass::
+
+    >>~ shell
+    $ vendor/bin/kmsci -i
+    >>: $this->assertEquals(0, $this->returnvar);
 
 Adding some more functionality - using CasperJS
 -----------------------------------------------
@@ -184,11 +350,11 @@ Let's add a select box on our frontpage which will magically change the text. Th
 
 We will write the test first.
 
-To test webpage functionality we use `CasperJS <http://casperjs.org/>`_. Let's write a test in tests/integrations/main/frontpageTest.casper.js::
+To test webpage functionality we can use `CasperJS <http://casperjs.org/>`_. Let's write a test ::
 
+    >>~ file: integrations/main/frontpageTest.casper.js
     // we must pass this parameter to casper when running the test - this is the url we will access
     var url = casper.cli.get('url');
-
     casper.test.begin('changing selectbox on frontpage will change the text', 9, function suite(test) {
         casper.start(url).then(function(){
             // default selection is Summary
@@ -216,10 +382,14 @@ To test webpage functionality we use `CasperJS <http://casperjs.org/>`_. Let's w
 
 Now, let's run it with casperjs::
 
-    cv$ casperjs test tests/integrations/main/frontpageTest.casper.js --url=(The full url to your local cvproject domain)
+    >>~ shell-stderr
+    $ casperjs test integrations/main/frontpageTest.casper.js '--url=http://localhost:14398/'
+    >>: $this->assertNotEquals(0, $this->returnvar);
+    >>: $this->assertContains('FAIL 1 test', $this->output);
 
 Of course, it will fail, let's implement the relevant code in index.html::
 
+    >>~ file: web/index.html
     <html>
         <head>
             <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
@@ -237,45 +407,103 @@ Of course, it will fail, let's implement the relevant code in index.html::
             <script>
                 $(function(){
                     $('#selbox').on('change', function(){
-                    switch ($(this).val()) {
-                        case 'education':
-                        $('#selboxtext').html('My Education');break;
-                        case 'languages':
-                        $('#selboxtext').html('My Languages');break;
-                        default:
-                        $('#selboxtext').html('Summary of my CV');break;
-                    };
+                        switch ($(this).val()) {
+                            case 'education':
+                                $('#selboxtext').html('My Education');break;
+                            case 'languages':
+                                $('#selboxtext').html('My Languages');break;
+                            default:
+                                $('#selboxtext').html('Summary of my CV');break;
+                        };
                     });
                 });
             </script>
         </body>
     </html>
 
-Now, run the test again and it will pass.
+Now, run the test again and it will pass::
+
+    >>~ shell
+    $ casperjs test integrations/main/frontpageTest.casper.js '--url=http://localhost:14398/'
+    >>: $this->assertEquals(0, $this->returnvar);
 
 Integrating the casper test with kms-ci-framework
 -------------------------------------------------
 
-You can skip to the next section if you are not using kms-ci-framework: `Refactor - using qunit`_.
+Now, let's integrate this test into our integration test::
 
-Now, let's integrate this test into our integration test. Edit tests/integrations/main/main.php::
-
-    public function testFrontpageSelbox()
-    {
-        $helper = new KmsCi_Runner_IntegrationTest_Helper_CasperTest($this);
-        return $helper->test('frontpageTest', 'frontpage', array('url' => $this->getAbsoluteUrl('/')));
+    >>~ file: integrations/main/main.php
+    <?php
+    class IntegrationTests_main extends KmsCi_Runner_IntegrationTest_Base {
+        public function testFrontpage()
+        {
+            $helper = new KmsCi_Runner_IntegrationTest_Helper_Screenshot($this);
+            if (!$helper->get('/', 1024, 768, 'frontpage')) {
+                return false;
+            } elseif (strpos($helper->getLastHtmlContent(), 'Welcome to the frontpage of the test CV project!') === false) {
+                return $this->_runner->error(' FAILED - expected content was not found');
+            } else {
+                return true;
+            }
+        }
+        public function getAbsoluteUrl($relativeUrl)
+        {
+            return $this->_runner->getConfig('baseUrl').$relativeUrl;
+        }
+        public function testFrontpageSelbox()
+        {
+            $helper = new KmsCi_Runner_IntegrationTest_Helper_CasperTest($this);
+            return $helper->test('frontpageTest', null, array('url' => $this->getAbsoluteUrl('/')));
+        }
     }
 
-Now, run "kmsci -i" - you will get an error: "You should implement the getIntegrationPath method to return a path where extra required files exist". This is a method that returns the path where kms-ci-framework will search for the casper test. Add it to tests/integrations/main/main.php::
+Now, run "kmsci -i" - you will get an error::
 
-    public function getIntegrationPath()
-    {
-	return __DIR__;
+    >>~ shell-stderr
+    $ vendor/bin/kmsci -i
+    >>: $this->assertNotEquals(0, $this->returnvar);
+    >>: $this->assertContains('You should implement the getIntegrationPath method to return a path where extra required files exist', $this->output);
+
+The casper integration helper needs to know where the integration files are located (to find our frontpageTest.casper.js file.
+
+We need to add the getIntegrationPath method which in most cases will be __DIR__::
+
+    >>~ file: integrations/main/main.php
+    <?php
+    class IntegrationTests_main extends KmsCi_Runner_IntegrationTest_Base {
+        public function testFrontpage()
+        {
+            $helper = new KmsCi_Runner_IntegrationTest_Helper_Screenshot($this);
+            if (!$helper->get('/', 1024, 768, 'frontpage')) {
+                return false;
+            } elseif (strpos($helper->getLastHtmlContent(), 'Welcome to the frontpage of the test CV project!') === false) {
+                return $this->_runner->error(' FAILED - expected content was not found');
+            } else {
+                return true;
+            }
+        }
+        public function getAbsoluteUrl($relativeUrl)
+        {
+            return $this->_runner->getConfig('baseUrl').$relativeUrl;
+        }
+        public function testFrontpageSelbox()
+        {
+            $helper = new KmsCi_Runner_IntegrationTest_Helper_CasperTest($this);
+            return $helper->test('frontpageTest', null, array('url' => $this->getAbsoluteUrl('/')));
+        }
+        public function getIntegrationPath()
+        {
+            return __DIR__;
+        }
     }
 
-Now, run "kmsci -i" and all the tests should pass.
+Now, run "kmsci -i" and all the tests should pass::
 
-Notice that the casper test included a dump of it's output in .output/main/dump/frontpage.casper.log
+    >>~ shell
+    $ vendor/bin/kmsci -i
+    >>: $this->assertEquals(0, $this->returnvar);
+
+Notice that the casper test included a dump of it's output in output/main/dump/frontpageTest.casper.log
 
 Refactor - using qunit
 ----------------------
