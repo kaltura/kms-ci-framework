@@ -25,6 +25,11 @@ module.exports = {
             integenv = JSON.parse(integenv);
         }
         kmsci.integration.init(kmsci, integenv);
+        casper.options.waitTimeout = 30000;
+        casper.options.viewportSize = {'width': 1024, 'height': 768};
+        casper.on('remote.message', function(msg) {
+            casper.log('remote message caught: ' + msg);
+        });
     },
 
     validateParams: function(params)
