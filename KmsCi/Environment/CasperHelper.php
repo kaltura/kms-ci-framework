@@ -16,7 +16,7 @@ class KmsCi_Environment_CasperHelper extends KmsCi_Environment_BaseHelper {
             $escapedparams .= ' '.escapeshellarg('--'.$key.'='.$value);
         };
         $casper = $this->get();
-        $cmd = $casper.' test --no-colors'.$escapedparams.' '.escapeshellarg($jsFilename);
+        $cmd = $casper.' test --verbose --log-level=debug --no-colors'.$escapedparams.' '.escapeshellarg($jsFilename);
         exec($cmd, $output, $returnvar);
         if ($returnvar === 0) {
             $output = implode("\n", $output);
