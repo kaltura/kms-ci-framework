@@ -55,7 +55,7 @@ class KmsCi_Environment_PhpmigHelper_Phpmig {
         $container = array();
         if (file_exists($kmigpath.'/phpmig.php')) {
             $this->_hasPhpmig = true;
-            require_once($kmigpath.'/phpmig.php');
+            require($kmigpath.'/phpmig.php');
             if (empty($container)) {
                 throw new Exception('invalid container, make sure the relevant phpmig.php file sets a $container variable');
             }
