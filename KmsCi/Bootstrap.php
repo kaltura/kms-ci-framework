@@ -4,7 +4,7 @@ class KmsCi_Bootstrap {
 
     protected static $_runner = null;
 
-    protected static $_integration = null;
+    protected static $_integrations = array();
 
     public static function setRunner($runner)
     {
@@ -39,16 +39,15 @@ class KmsCi_Bootstrap {
      */
     public static function getIntegration($runner)
     {
-        if (is_null(self::$_integration)) {
-            if (getenv('KMSCI_INTEGRATION_ID')) {
+        if ($integrationId = getenv('KMSCI_INTEGRATION_ID')) {
+            if (!array_key_exists($integrationId, self::$_integrations)) {
                 $classname = KmsCi_Runner_IntegrationTests::getIntegrationClassById(getenv('KMSCI_INTEGRATION_ID'), $runner);
-                $integration = new $classname($runner, getenv('KMSCI_INTEGRATION_ID'));
-                self::$_integration = $integration;
-            } else {
-                self::$_integration = false;
+                self::$_integrations[$integrationId] = new $classname($runner, getenv('KMSCI_INTEGRATION_ID'));
             }
+            return self::$_integrations[$integrationId];
+        } else {
+            return false;
         }
-        return self::$_integration;
     }
 
 }
