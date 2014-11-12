@@ -19,6 +19,12 @@ class KmsCi_Kmig_RunnerCommand extends KmsCi_Runner_CommandBase {
                 }
                 return true;
             });
+            $this->_runner->getEnvironment()->on('IntegrationTest::setup', function($integId, $integration) use($runner) {
+                /** @var KmsCi_CliRunnerAbstract $runner */
+                $helper = KmsCi_Kmig_IntegrationHelper::getInstance($integration);
+                $runner->getUtilHelper()->softUnlink($helper->getKmigPhpmigDataFileName());
+                return true;
+            });
         }
     }
 
