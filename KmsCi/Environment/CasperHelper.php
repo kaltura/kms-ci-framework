@@ -23,7 +23,8 @@ class KmsCi_Environment_CasperHelper extends KmsCi_Environment_BaseHelper {
             if (!empty($logDumpFilename)) {
                 file_put_contents($logDumpFilename, $output);
             } else {
-                echo $output;
+                // TODO: this should be done only if debug
+                //echo $output;
             }
             return true;
         } else {

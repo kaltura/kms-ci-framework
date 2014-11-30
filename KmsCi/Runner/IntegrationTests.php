@@ -119,22 +119,39 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
     {
         $foundIt = false;
         $retClassName = '';
-        $rootPath = $runner->getConfig('rootPath', '');
-        if (!empty($rootPath)) {
-            // look for integration in directories under the rootPath
-            $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($rootPath), RecursiveIteratorIterator::SELF_FIRST);
-            foreach($files as $file) {
-                /** @var DirectoryIterator $file */
-                $filename = $file->getPathname();
-                if (strpos($filename, '/tests/integration/main.php') !== false) {
-                    $str = file_get_contents($filename);
-                    if (preg_match("/\s+([a-zA-Z]+)_Integration\s/i", $str, $matches)) {
-                        $tmpIntegid = strtolower($matches[1]);
-                        if ($integId == $tmpIntegid) {
-                            $clsname = ucfirst($tmpIntegid).'_Integration';
-                            require_once($filename);
-                            $retClassName = $clsname;
-                            $foundIt = true;
+        $integmapfile = $runner->getConfigPath().'/integrationMap.json';
+        if (file_exists($integmapfile)) {
+            $integmap = json_decode(file_get_contents($integmapfile), true);
+        } else {
+            $integmap = array();
+        };
+        if (array_key_exists($integId, $integmap)) {
+            list($retClassName, $filename) = $integmap[$integId];
+            if (file_exists($filename)) {
+                require_once($filename);
+                $foundIt = true;
+            }
+        }
+        if (!$foundIt) {
+            $rootPath = $runner->getConfig('rootPath', '');
+            if (!empty($rootPath)) {
+                // look for integration in directories under the rootPath
+                $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($rootPath), RecursiveIteratorIterator::SELF_FIRST);
+                foreach ($files as $file) {
+                    /** @var DirectoryIterator $file */
+                    $filename = $file->getPathname();
+                    if (strpos($filename, '/tests/integration/main.php') !== false) {
+                        $str = file_get_contents($filename);
+                        if (preg_match("/\s+([a-zA-Z]+)_Integration\s/i", $str, $matches)) {
+                            $tmpIntegid = strtolower($matches[1]);
+                            if ($integId == $tmpIntegid) {
+                                $clsname = ucfirst($tmpIntegid) . '_Integration';
+                                require_once($filename);
+                                $retClassName = $clsname;
+                                $foundIt = true;
+                                $integmap[$integId] = array($retClassName, $filename);
+                                file_put_contents($integmapfile, json_encode($integmap));
+                            }
                         }
                     }
                 }
@@ -148,6 +165,8 @@ class KmsCi_Runner_IntegrationTests extends KmsCi_Runner_Base {
             } else {
                 require_once($mainfn);
                 $retClassName = $clsname;
+                $integmap[$integId] = array($retClassName, $mainfn);
+                file_put_contents($integmapfile, json_encode($integmap));
             }
         }
         return $retClassName;
