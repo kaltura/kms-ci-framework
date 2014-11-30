@@ -40,6 +40,14 @@ class KmsCi_Runner_IntegrationTest_Helper_Phpunit extends KmsCi_Runner_Integrati
             }
             $browsers = json_encode($browsers);
         }
+        if (is_array($browsers)) {
+            $seleniumHost = $this->_runner->getConfig('seleniumHost', '');
+            if (!empty($seleniumHost)) {
+                foreach ($browsers as $browser) {
+                    $browser['baseHost'] = $seleniumHost;
+                }
+            }
+        }
         $args = array_merge($args, array('browsers'=>$browsers));
         $browsers = json_decode($browsers);
         if (empty($browsers)) {

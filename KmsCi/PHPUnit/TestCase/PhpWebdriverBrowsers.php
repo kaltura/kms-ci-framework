@@ -69,6 +69,7 @@ class KmsCi_PHPUnit_TestCase_PhpWebdriverBrowsers extends PHPUnit_Framework_Test
         if (array_key_exists('platform', $browser)) {
             $capabilities->setPlatform($browser['platform']);
         }
+        $baseHost = array_key_exists('baseHost', $browser) ? $browser['baseHost'] : 'localhost';
         if (array_key_exists('sauce', $browser)) {
             $host = 'http://'.$browser['sauce'].'@ondemand.saucelabs.com:80/wd/hub';
             if (getenv('TRAVIS_JOB_NUMBER')) {
@@ -79,9 +80,9 @@ class KmsCi_PHPUnit_TestCase_PhpWebdriverBrowsers extends PHPUnit_Framework_Test
         } elseif (array_key_exists('host', $browser)) {
             $host = $browser['host'];
         } elseif ($browserName == 'chrome') {
-            $host = 'http://localhost:9515';
+            $host = 'http://'.$baseHost.':9515';
         } else {
-            $host = 'http://localhost:4444/wd/hub';
+            $host = 'http://'.$baseHost.':4444/wd/hub';
         }
         $timeout = array_key_exists('timeout', $browser) ? $browser['timeout'] : 30000;
         $driver = RemoteWebDriver::create($host, $capabilities, $timeout);
