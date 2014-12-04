@@ -25,17 +25,17 @@ abstract class KmsCi_CliRunnerAbstract {
         $this->_args = $this->_parseArgs($args);
         $this->_config = $this->_overrideConfig($config);
         $this->_environment = $this->_getNewEnvironment();
-        $this->_addGuiRunnerCommand();
+        $this->_addAdminServerRunnerCommand();
         $this->_init();
     }
 
     /**
-     * Add the Gui runner command
-     * you can override this to change the gui runner or disable it in your runners
+     * Add the admin server runner command
+     * you can override this to change the admin server runner or disable it in your runners
      */
-    protected function _addGuiRunnerCommand()
+    protected function _addAdminServerRunnerCommand()
     {
-        $cmd = new KmsCi_Runner_Command_Gui($this);
+        $cmd = new KmsCi_Runner_Command_AdminServer($this);
         $this->addCommand($cmd);
     }
 
