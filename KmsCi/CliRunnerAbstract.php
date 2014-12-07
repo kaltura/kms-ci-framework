@@ -82,45 +82,31 @@ abstract class KmsCi_CliRunnerAbstract {
     {
         $helpData = array(
             'misc' => array('Miscellaneous Options',
-                'all' =>
-                    "  -a, --all                    run all the integration and unit-tests",
-                'build' =>
-                    "  -b, --build                  prepare the environment for ant build",
-                'clear' =>
-                    "  -c, --clear                  clear the environment",
-                'restore' =>
-                    "  -r, --restore                restore the environment (after setup or setup-integration)",
-                'override' =>
-                    " -oKEY=VAL, --override KEY=VAL override a configuration value (can be set multiple times)",
-                'run-script' =>
-                    " --run-script FILENAME         run a php script file in the context of the kmsci framework",
-                'verbose' =>
-                    " -v, --verbose                 verbose output",
-                'debug' =>
-                    " -d, --debug                   debug output",
+                'all' => array('short' => 'a', 'help' => 'run all the integration and unit-tests', 'task' => true),
+                'build' => array('short' => 'b', 'help' => 'prepare the environment for ant build', 'gui_hide' => true),
+                'clear' => array('short' => 'c', 'help' => 'clear the environment', 'task' => true),
+                'restore' => array('short' => 'r', 'help' => 'restore the environment (after setup or setup-integration)', 'gui_hide' => true),
+                'override' => array('short' => 'o', 'help' => 'override a configuration value (can be set multiple times)', 'texthelp' => 'KEY=VAL', 'gui_hide' => true),
+                'run-script' => array('help' => 'run a php script file in the context of the kmsci framework', 'texthelp' => 'FILENAME', 'gui_hide' => true),
+                'verbose' => array('short' => 'v', 'help' => 'verbose output', 'gui_hide' => true),
+                'debug' => array('short' => 'd', 'help' => 'debug output', 'gui_hide' => true),
             ),
             'test-filtering' => array('Test filtering',
-                'filter' =>
-                    "  -fREGEX, --filter REGEX      regular expression filter of tests\n"
-                   ."                               (unit tests on class name, integrations on integration id)",
-                'filter-tests' =>
-                    "  --filter-tests REGEX         more fine-grained filtering of individual test methods"
+                'filter' => array('short' => 'f', 'help' => "regular expression filter of tests\n(unit tests on class name, integrations on integration id)", 'texthelp' => 'REGEX'),
+                'filter-tests' => array('help' => 'more fine-grained filtering of individual test methods', 'texthelp' => 'REGEX'),
             ),
             'remote-integrations' => array('Running remote integration tests',
                 'remote-integrations' =>
                     "  -m, --remote-integrations    run only the remote integration tests"
             ),
             'unit-tests' => array('Running unit tests',
-                'tests' =>
-                    "  -t, --tests                  run only the unit tests",
-                'qunit' =>
-                    "  -q, --qunit                  run the qunit js unit tests",
+                'tests' => array('short' => 't', 'help' => 'run only the unit tests', 'task' => true),
+                'qunit' => array('short' => 'q', 'help' => 'run the qunit js unit tests', 'task' => true),
                 'setup' =>
                     "  -s, --setup                  setup the environment for debugging unit tests (use -r to restore afterwards)"
             ),
             'integrations' => array('Running integration tests',
-                'integrations' =>
-                    "  -i, --integrations           run only the integration tests",
+                'integrations' => array('short' => 'i', 'help' => 'run only the integration tests', 'task' => true),
                 'setup-integration' =>
                     "  --setup-integration INTEGID  setup environment for a specific integration (use -r to restore afterwards)"
             )
@@ -407,12 +393,48 @@ abstract class KmsCi_CliRunnerAbstract {
 
     public function help()
     {
+        $helpData = $this->_getHelpData();
+        $this->_environment->invoke('CliRunnerAbstract::help::pre', array($helpData));
         echo "\n".'usage: kmsci [OPTIONS]...'."\n\n";
-        foreach ($this->_getHelpData() as $sectionData) {
+        foreach ($helpData as $sectionData) {
             echo $sectionData[0]."\n\n";
             foreach ($sectionData as $optionId=>$optionHelpText) {
                 if (!is_numeric($optionId)) {
-                    echo $optionHelpText."\n";
+                    if (is_array($optionHelpText)) {
+                        // short
+                        // help
+                        // texthelp
+                        $tmp = '  ';
+                        if (array_key_exists('short', $optionHelpText)) {
+                            $tmp .= '-'.$optionHelpText['short'];
+                            if (array_key_exists('texthelp', $optionHelpText)) {
+                                $tmp .= $optionHelpText['texthelp'];
+                            }
+                            $tmp .= ', ';
+                        }
+                        $tmp .= '--'.$optionId;
+                        if (array_key_exists('texthelp', $optionHelpText)) {
+                            $tmp .= ' '.$optionHelpText['texthelp'];
+                        }
+                        echo $tmp;
+                        $remainingChars = 31 - strlen($tmp);
+                        if ($remainingChars < 2) {
+                            echo ' ';
+                        } else {
+                            echo str_repeat(' ', $remainingChars);
+                        }
+                        $tmp = array();
+                        $first = true;
+                        foreach (explode("\n", $optionHelpText['help']) as $line) {
+                            if ($first) $tmp[] = $line;
+                            else $tmp[] = str_repeat(' ', 31).$line;
+                            $first = false;
+                        }
+                        echo implode("\n", $tmp);
+                    } else {
+                        echo $optionHelpText;
+                    }
+                    echo "\n";
                 }
             }
             echo "\n";
