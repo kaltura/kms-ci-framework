@@ -6,6 +6,22 @@ class KmsCi_Runner_Command_AdminServer extends KmsCi_Runner_CommandBase {
     protected $_process = null;
     protected $_pipes = null;
 
+    public function _init()
+    {
+        $that = $this;
+        $this->_runner->getEnvironment()->on('CliRunnerAbstract::help::pre', function($helpData) use($that) {
+            if ($this->_runner->isArg('admin-server-help')) {
+                echo "HELLO WORLD!!!!";
+            }
+            return true;
+        });
+    }
+
+    public function out($data)
+    {
+        //echo '~'.'~'.''
+    }
+
     public function validateArgs()
     {
         return $this->_runner->isArg('admin-server');

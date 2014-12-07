@@ -8,6 +8,7 @@ class KmsCi_Runner_CommandBase {
     public function __construct($runner)
     {
         $this->_runner = $runner;
+        $this->_init();
     }
 
     public function validateArgs()
@@ -23,6 +24,11 @@ class KmsCi_Runner_CommandBase {
     public function getHelpData()
     {
         return array();
+    }
+
+    protected function _init()
+    {
+
     }
 
 } 
