@@ -18,7 +18,7 @@ class IntegrationTests_testproj extends KmsCi_Runner_IntegrationTest_Base {
             if ($kmsci == 'kmsci') {
                 $kmsci = __DIR__.'/../../../bin/kmsci';
             }
-            $cmd = 'KMSCI_RUNNER_PATH='.escapeshellarg($kmscipath).' '.$kmsci.' '.$params;
+            $cmd = 'KMSCI_RUNNER_PATH='.KmsCi_Environment_UtilHelper::escapeShellArgument($kmscipath).' '.$kmsci.' '.$params;
             if ($this->_runner->getUtilHelper()->exec($cmd)) {
                 return $this->_runner->getUtilHelper()->getExecOutput();
             } else {

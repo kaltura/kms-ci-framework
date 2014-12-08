@@ -27,9 +27,9 @@ class KmsCi_Runner_Tests_TestCase {
     protected function _getCmd()
     {
         $bootstrapfile = $this->_runner->getConfig('testsBootstrapFile', '');
-        $bootstrapfileparam = empty($bootstrapfile) ? '' : ' --bootstrap '.escapeshellarg($bootstrapfile);
+        $bootstrapfileparam = empty($bootstrapfile) ? '' : ' --bootstrap '.KmsCi_Environment_UtilHelper::escapeShellArgument($bootstrapfile);
         $phpunitcmd = $this->_runner->getEnvironment()->getHelper('php')->getPhpUnit();
-        $cmd = $phpunitcmd.' --log-junit '.escapeshellarg($this->_tmpXmlPath).$bootstrapfileparam.' '.escapeshellarg($this->_classname).' '.escapeshellarg($this->_filename).' 2>&1';
+        $cmd = $phpunitcmd.' --log-junit '.KmsCi_Environment_UtilHelper::escapeShellArgument($this->_tmpXmlPath).$bootstrapfileparam.' '.KmsCi_Environment_UtilHelper::escapeShellArgument($this->_classname).' '.KmsCi_Environment_UtilHelper::escapeShellArgument($this->_filename).' 2>&1';
         return $cmd;
     }
 

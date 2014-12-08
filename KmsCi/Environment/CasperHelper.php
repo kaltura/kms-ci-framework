@@ -13,10 +13,10 @@ class KmsCi_Environment_CasperHelper extends KmsCi_Environment_BaseHelper {
         $params['kmscienv'] = json_encode($this->_runner->exportEnvironment());
         $escapedparams = '';
         foreach ($params as $key=>$value) {
-            $escapedparams .= ' '.escapeshellarg('--'.$key.'='.$value);
+            $escapedparams .= ' '.KmsCi_Environment_UtilHelper::escapeShellArgument('--'.$key.'='.$value);
         };
         $casper = $this->get();
-        $cmd = $casper.' test --verbose --log-level=debug --no-colors'.$escapedparams.' '.escapeshellarg($jsFilename);
+        $cmd = $casper.' test --verbose --log-level=debug --no-colors'.$escapedparams.' '.KmsCi_Environment_UtilHelper::escapeShellArgument($jsFilename);
         exec($cmd, $output, $returnvar);
         if ($returnvar === 0) {
             $output = implode("\n", $output);

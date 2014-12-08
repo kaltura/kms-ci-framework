@@ -8,23 +8,19 @@ class KmsCi_Environment_PhpmigHelper extends KmsCi_Environment_BaseHelper {
     public function exec($envParams, $bootstrapFile, $params = null)
     {
         if (empty($params)) $params = array();
-        $cmd = '';
-        foreach($envParams as $k=>$v) {
-            $cmd.=$k.'='.escapeshellarg($v).' ';
-        }
-        $cmd .= $this->_runner->getUtilHelper()->getBin('phpmig');
+        $cmd = $this->_runner->getUtilHelper()->getBin('phpmig');
         if ($this->_runner->isArg('debug') || $this->_runner->isArg('verbose')) {
             $cmd .= ' -vvv';
         }
-        if (!empty($bootstrapFile)) $cmd .= ' --bootstrap='.escapeshellarg($bootstrapFile);
+        if (!empty($bootstrapFile)) $cmd .= ' --bootstrap='.KmsCi_Environment_UtilHelper::escapeShellArgument($bootstrapFile);
         foreach ($params as $k=>$v) {
             if (is_numeric($k)) {
-                $cmd .= ' '.escapeshellarg($v);
+                $cmd .= ' '.KmsCi_Environment_UtilHelper::escapeShellArgument($v);
             } else {
-                $cmd .= '--'.$k.'='.escapeshellarg($v);
+                $cmd .= '--'.$k.'='.KmsCi_Environment_UtilHelper::escapeShellArgument($v);
             }
         };
-        $ans = $this->_runner->getUtilHelper()->exec($cmd);
+        $ans = $this->_runner->getUtilHelper()->exec($cmd, $envParams);
         \Kmig\Migrator::clearCaches();
         return $ans;
     }

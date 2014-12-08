@@ -50,7 +50,7 @@ class KmsCi_Kmig_RunnerCommand extends KmsCi_Runner_CommandBase {
         } else {
             $params = array();
             foreach ($this->_runner->getArgs() as $k=>$v) {
-                if (strpos($k, 'kmig-') === 0) {
+                if (strpos($k, 'kmig-') === 0 && $k != 'kmig-destroy') {
                     $tmp = explode('kmig-', $k);
                     $k = $tmp[1];
                     if ($v === true) {

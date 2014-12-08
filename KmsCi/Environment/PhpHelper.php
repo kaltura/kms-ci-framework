@@ -30,17 +30,17 @@ class KmsCi_Environment_PhpHelper extends KmsCi_Environment_BaseHelper {
         if (!is_array($args)) $args = array();
         if (!is_string($switches)) $switches = '';
         $phpunit = $this->getPhpUnit();
-        $cmd = (empty($preCmd)?'':$preCmd.' ')."KMSCI_RUNNER_PATH='".$this->_runner->getConfigPath()."' ".$phpunit.(empty($switches)?'': ' '.$switches).' '.escapeshellarg($classname).' '.escapeshellarg($filename);
+        $cmd = (empty($preCmd)?'':$preCmd.' ')."KMSCI_RUNNER_PATH='".$this->_runner->getConfigPath()."' ".$phpunit.(empty($switches)?'': ' '.$switches).' '.KmsCi_Environment_UtilHelper::escapeShellArgument($classname).' '.KmsCi_Environment_UtilHelper::escapeShellArgument($filename);
         if (is_array($args)) {
             foreach ($args as $k=>$v) {
-                $cmd .= ' '.escapeshellarg('--param-'.$k.'='.$v);
+                $cmd .= ' '.KmsCi_Environment_UtilHelper::escapeShellArgument('--param-'.$k.'='.$v);
             }
         }
         if ($this->_runner->getUtilHelper()->exec($cmd)) {
             return true;
         } else {
-            echo $cmd."\n";
-            echo implode("\n", $this->_runner->getUtilHelper()->getExecOutput());
+            $this->log($cmd);
+            $this->log(implode("\n", $this->_runner->getUtilHelper()->getExecOutput()));
             return false;
         }
     }
