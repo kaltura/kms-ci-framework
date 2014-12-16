@@ -10,16 +10,17 @@ class KmsCi_Environment_CasperHelper extends KmsCi_Environment_BaseHelper {
 
     public function test($jsFilename, $logDumpFilename, $params)
     {
-        $params['kmscienv'] = json_encode($this->_runner->exportEnvironment());
-        $escapedparams = '';
+        $cmd = $this->get();
+        $args = array(
+            '--verbose', '--log-level=debug', '--no-colors',
+            '--kmscienv='.json_encode($this->_runner->exportEnvironment()),
+            $jsFilename
+        );
         foreach ($params as $key=>$value) {
-            $escapedparams .= ' '.KmsCi_Environment_UtilHelper::escapeShellArgument('--'.$key.'='.$value);
+            $args[] = '--'.$key.'='.$value;
         };
-        $casper = $this->get();
-        $cmd = $casper.' test --verbose --log-level=debug --no-colors'.$escapedparams.' '.KmsCi_Environment_UtilHelper::escapeShellArgument($jsFilename);
-        exec($cmd, $output, $returnvar);
-        if ($returnvar === 0) {
-            $output = implode("\n", $output);
+        if (PhpCrossplatform\PHPCP::exec($cmd, array('args' => $args), $res)) {
+            $output = implode("\n", $res->output);
             if (!empty($logDumpFilename)) {
                 file_put_contents($logDumpFilename, $output);
             } else {
@@ -29,7 +30,7 @@ class KmsCi_Environment_CasperHelper extends KmsCi_Environment_BaseHelper {
             return true;
         } else {
             echo $cmd."\n";
-            echo implode("\n", $output);
+            echo implode("\n", $res->output);
             return false;
         }
     }

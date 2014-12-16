@@ -25,10 +25,20 @@ class KmsCi_Environment_PhpHelper extends KmsCi_Environment_BaseHelper {
         return $this->getBin('php');
     }
 
-    public function execPhpunit($filename, $classname, $switches, $args, $preCmd = '')
+    public function execPhpunit($filename, $classname, $args = null, $env = null)
     {
-        if (!is_array($args)) $args = array();
-        if (!is_string($switches)) $switches = '';
+        if (empty($args)) $args = array();
+        if (empty($env)) $env = array();
+        $cmd = $this->getPhpUnit();
+        $env = array_merge(
+            array('KMSCI_RUNNER_PATH' => $this->_runner->getConfigPath()),
+            $env
+        );
+        $args = array_merge(
+            $args,
+            array($classname, $filename)
+        );
+
         $phpunit = $this->getPhpUnit();
         $cmd = (empty($preCmd)?'':$preCmd.' ')."KMSCI_RUNNER_PATH='".$this->_runner->getConfigPath()."' ".$phpunit.(empty($switches)?'': ' '.$switches).' '.KmsCi_Environment_UtilHelper::escapeShellArgument($classname).' '.KmsCi_Environment_UtilHelper::escapeShellArgument($filename);
         if (is_array($args)) {

@@ -35,21 +35,14 @@ class KmsCi_Environment_PhantomHelper extends KmsCi_Environment_BaseHelper
 
     public function run($jsFilename, $extraargs = '')
     {
-        $phantomjs = $this->get();
-        if (!empty($extraargs) && is_array($extraargs)) {
-            $tmp = array();
-            foreach ($extraargs as $arg) {
-                $tmp[] = KmsCi_Environment_UtilHelper::escapeShellArgument($arg);
-            }
-            $extraargs = ' '.implode(' ', $tmp);
-        }
-        exec($phantomjs.' '.KmsCi_Environment_UtilHelper::escapeShellArgument($jsFilename).$extraargs, $output, $returnvar);
-        if ($returnvar === 0) {
+        $cmd = $this->get();
+        $args = array_merge(array($jsFilename), $extraargs);
+        if (PhpCrossplatform\PHPCP::exec($cmd, array('args' => $args), $res)) {
             return true;
         } else {
-            echo implode("\n", $output);
+            echo implode("\n", $res->output);
             return false;
-        };
+        }
     }
 
 }

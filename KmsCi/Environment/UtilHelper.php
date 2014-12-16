@@ -91,7 +91,7 @@ class KmsCi_Environment_UtilHelper extends KmsCi_Environment_BaseHelper {
 
     public function exec($cmd, $env = array())
     {
-		$param = json_encode(array(
+        $param = json_encode(array(
 			'cmd' => $cmd,
 			'env' => $env,
 			'passthru' => $this->_execPassthru
